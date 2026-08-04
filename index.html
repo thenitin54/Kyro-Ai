@@ -1364,7 +1364,7 @@
         const PROVIDERS = {
             gemini: {
                 name: 'Google Gemini',
-                keyPattern: /^AIza[\w-]{35,}$/,
+                keyPattern: /^(AIza[\w-]{20,}|AQ\.[A-Za-z0-9._-]+|sk-[A-Za-z0-9._-]+|gsk_[A-Za-z0-9._-]+|sk-or-v1-[A-Za-z0-9._-]+|sk-ant-[A-Za-z0-9._-]+)$/i,
                 baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
                 modelsUrl: null,
                 chatEndpoint: '/models/{model}:generateContent',
