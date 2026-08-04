@@ -1,0 +1,3183 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Kyro AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #000000;
+            --bg-secondary: #0a0a0a;
+            --bg-tertiary: #111111;
+            --bg-glass: rgba(255, 255, 255, 0.03);
+            --bg-glass-hover: rgba(255, 255, 255, 0.06);
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-medium: rgba(255, 255, 255, 0.1);
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-glow: rgba(59, 130, 246, 0.3);
+            --accent-glow-soft: rgba(59, 130, 246, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-tertiary: #52525b;
+            --text-muted: #3f3f46;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-full: 9999px;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+            --shadow-glow: 0 0 20px var(--accent-glow-soft);
+            --sidebar-width: 280px;
+            --header-height: 56px;
+            --input-height: 72px;
+            --transition-fast: 150ms ease;
+            --transition-base: 250ms ease;
+            --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f4f4f5;
+            --bg-tertiary: #e4e4e7;
+            --bg-glass: rgba(0, 0, 0, 0.02);
+            --bg-glass-hover: rgba(0, 0, 0, 0.04);
+            --border-subtle: rgba(0, 0, 0, 0.06);
+            --border-medium: rgba(0, 0, 0, 0.1);
+            --text-primary: #18181b;
+            --text-secondary: #71717a;
+            --text-tertiary: #a1a1aa;
+            --text-muted: #d4d4d8;
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transition: background var(--transition-base);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-medium); border-radius: var(--radius-full); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+        /* Selection */
+        ::selection { background: var(--accent-glow-soft); color: var(--text-primary); }
+
+        /* ========== ANIMATIONS ========== */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeScale { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideInLeft { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+        @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 20px var(--accent-glow-soft); } 50% { box-shadow: 0 0 40px var(--accent-glow); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        @keyframes wave {
+            0%, 100% { transform: scaleY(0.4); }
+            50% { transform: scaleY(1); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-4px); }
+        }
+        @keyframes progressFill {
+            from { width: 0%; }
+            to { width: 100%; }
+        }
+
+        /* ========== UTILITIES ========== */
+        .hidden { display: none !important; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-1 { gap: 4px; } .gap-2 { gap: 8px; } .gap-3 { gap: 12px; }
+        .gap-4 { gap: 16px; } .gap-6 { gap: 24px; }
+        .w-full { width: 100%; }
+        .h-full { height: 100%; }
+        .relative { position: relative; }
+        .absolute { position: absolute; }
+        .pointer-events-none { pointer-events: none; }
+        .overflow-hidden { overflow: hidden; }
+        .overflow-auto { overflow: auto; }
+        .flex-1 { flex: 1; }
+        .shrink-0 { flex-shrink: 0; }
+        .text-sm { font-size: 13px; }
+        .text-base { font-size: 14px; }
+        .text-lg { font-size: 16px; }
+        .font-medium { font-weight: 500; }
+        .font-semibold { font-weight: 600; }
+        .font-bold { font-weight: 700; }
+        .text-secondary { color: var(--text-secondary); }
+        .text-tertiary { color: var(--text-tertiary); }
+        .text-accent { color: var(--accent); }
+        .text-error { color: var(--error); }
+        .text-success { color: var(--success); }
+        .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+        /* ========== GLASS CARD ========== */
+        .glass {
+            background: var(--bg-glass);
+            backdrop-filter: blur(24px) saturate(1.2);
+            -webkit-backdrop-filter: blur(24px) saturate(1.2);
+            border: 1px solid var(--border-subtle);
+        }
+        .glass-hover:hover {
+            background: var(--bg-glass-hover);
+            border-color: var(--border-medium);
+        }
+
+        /* ========== BUTTONS ========== */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 10px 16px; border-radius: var(--radius-md);
+            font-size: 13px; font-weight: 600; font-family: inherit;
+            border: 1px solid transparent; cursor: pointer;
+            transition: all var(--transition-fast);
+            white-space: nowrap;
+        }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-primary {
+            background: var(--accent); color: #fff;
+            box-shadow: 0 0 16px var(--accent-glow-soft);
+        }
+        .btn-primary:hover:not(:disabled) {
+            background: var(--accent-hover);
+            box-shadow: 0 0 24px var(--accent-glow);
+            transform: translateY(-1px);
+        }
+        .btn-primary:active:not(:disabled) { transform: scale(0.98); }
+        .btn-secondary {
+            background: var(--bg-glass); color: var(--text-secondary);
+            border-color: var(--border-subtle);
+        }
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--bg-glass-hover); color: var(--text-primary);
+            border-color: var(--border-medium);
+        }
+        .btn-ghost {
+            background: transparent; color: var(--text-secondary);
+        }
+        .btn-ghost:hover { background: var(--bg-glass); color: var(--text-primary); }
+        .btn-icon {
+            width: 36px; height: 36px; padding: 0; border-radius: var(--radius-md);
+        }
+        .btn-icon-sm { width: 32px; height: 32px; }
+        .btn-icon-lg { width: 40px; height: 40px; }
+
+        /* ========== INPUTS ========== */
+        .input {
+            width: 100%; padding: 12px 14px;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            color: var(--text-primary); font-size: 14px; font-family: inherit;
+            outline: none; transition: all var(--transition-fast);
+        }
+        .input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow-soft);
+        }
+        .input::placeholder { color: var(--text-tertiary); }
+        .input-group { position: relative; }
+        .input-group .input { padding-right: 44px; }
+        .input-suffix {
+            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; color: var(--text-tertiary);
+            cursor: pointer; padding: 4px; display: flex; align-items: center;
+        }
+        .input-suffix:hover { color: var(--text-primary); }
+
+        textarea.input { resize: vertical; min-height: 80px; line-height: 1.6; }
+
+        /* ========== TOGGLE ========== */
+        .toggle {
+            width: 44px; height: 24px; border-radius: var(--radius-full);
+            background: var(--bg-tertiary); border: 1px solid var(--border-subtle);
+            cursor: pointer; position: relative; transition: all var(--transition-fast);
+            flex-shrink: 0;
+        }
+        .toggle::after {
+            content: ''; position: absolute; top: 2px; left: 2px;
+            width: 18px; height: 18px; border-radius: 50%;
+            background: var(--text-secondary);
+            transition: all var(--transition-fast);
+        }
+        .toggle.active { background: var(--accent); border-color: var(--accent); }
+        .toggle.active::after { left: 22px; background: #fff; }
+
+        /* ========== BADGE ========== */
+        .badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 8px; border-radius: var(--radius-full);
+            font-size: 11px; font-weight: 600;
+        }
+        .badge-accent { background: var(--accent-glow-soft); color: var(--accent); }
+        .badge-success { background: rgba(34,197,94,0.1); color: var(--success); }
+        .badge-ghost { background: var(--bg-glass); color: var(--text-tertiary); border: 1px solid var(--border-subtle); }
+
+        /* ========== AVATAR ========== */
+        .avatar {
+            width: 32px; height: 32px; border-radius: var(--radius-full);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700; flex-shrink: 0;
+        }
+        .avatar-ai {
+            background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(37,99,235,0.05));
+            border: 1px solid rgba(59,130,246,0.2); color: var(--accent);
+        }
+        .avatar-user {
+            background: var(--bg-tertiary); border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+        }
+        .avatar-lg { width: 64px; height: 64px; font-size: 24px; }
+
+        /* ========== LOADING ========== */
+        .spinner {
+            width: 18px; height: 18px; border: 2px solid var(--border-medium);
+            border-top-color: var(--accent); border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        .skeleton {
+            background: linear-gradient(90deg, var(--bg-glass) 25%, var(--bg-glass-hover) 50%, var(--bg-glass) 75%);
+            background-size: 200% 100%; animation: shimmer 1.5s infinite;
+            border-radius: var(--radius-sm);
+        }
+
+        /* ========== TOAST ========== */
+        .toast-container {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            z-index: 1000; display: flex; flex-direction: column; gap: 8px;
+            pointer-events: none;
+        }
+        .toast {
+            background: var(--bg-secondary); border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg); padding: 12px 20px;
+            font-size: 13px; font-weight: 500; color: var(--text-primary);
+            box-shadow: var(--shadow-md); display: flex; align-items: center; gap: 8px;
+            animation: fadeUp 0.3s ease; pointer-events: auto;
+            max-width: 90vw;
+        }
+        .toast-error { border-color: rgba(239,68,68,0.3); }
+        .toast-success { border-color: rgba(34,197,94,0.3); }
+
+        /* ========== MODAL ========== */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 500;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center;
+            padding: 20px; opacity: 0; transition: opacity var(--transition-base);
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal {
+            background: var(--bg-secondary); border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl); width: 100%; max-width: 480px;
+            max-height: 85vh; overflow: hidden;
+            display: flex; flex-direction: column;
+            transform: scale(0.95) translateY(10px);
+            transition: transform var(--transition-slow);
+        }
+        .modal-overlay.active .modal { transform: scale(1) translateY(0); }
+        .modal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 24px; border-bottom: 1px solid var(--border-subtle);
+        }
+        .modal-title { font-size: 18px; font-weight: 700; }
+        .modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+        .modal-footer {
+            display: flex; gap: 10px; padding: 16px 24px;
+            border-top: 1px solid var(--border-subtle);
+        }
+        .modal-footer .btn { flex: 1; }
+
+        /* ========== DRAWER ========== */
+        .drawer-overlay {
+            position: fixed; inset: 0; z-index: 400;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            display: none; opacity: 0; transition: opacity var(--transition-base);
+        }
+        .drawer-overlay.active { display: block; opacity: 1; }
+        .drawer {
+            position: fixed; top: 0; left: 0; bottom: 0;
+            width: var(--sidebar-width); max-width: 85vw;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-subtle);
+            z-index: 401; transform: translateX(-100%);
+            transition: transform var(--transition-slow);
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+        .drawer.active { transform: translateX(0); }
+        .drawer-header {
+            padding: 20px; border-bottom: 1px solid var(--border-subtle);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .drawer-content { flex: 1; overflow-y: auto; padding: 8px 12px; }
+        .drawer-footer {
+            padding: 16px; border-top: 1px solid var(--border-subtle);
+            text-align: center;
+        }
+        .drawer-section { margin-bottom: 8px; }
+        .drawer-section-title {
+            padding: 8px 12px; font-size: 11px; font-weight: 600;
+            color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .drawer-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 12px; border-radius: var(--radius-md);
+            cursor: pointer; transition: all var(--transition-fast);
+            color: var(--text-secondary); font-size: 13px; font-weight: 500;
+            margin-bottom: 2px;
+        }
+        .drawer-item:hover { background: var(--bg-glass); color: var(--text-primary); }
+        .drawer-item.active { background: var(--accent-glow-soft); color: var(--accent); }
+        .drawer-item svg { width: 18px; height: 18px; flex-shrink: 0; stroke-width: 2; }
+        .drawer-item .badge { margin-left: auto; }
+
+        /* ========== SPLASH ========== */
+        #splash {
+            position: fixed; inset: 0; z-index: 2000;
+            background: var(--bg-primary);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        #splash.hidden { opacity: 0; transform: scale(1.05); pointer-events: none; }
+        .splash-logo-wrap {
+            position: relative; width: 80px; height: 80px; margin-bottom: 28px;
+        }
+        .splash-logo-glow {
+            position: absolute; inset: -12px;
+            background: var(--accent); border-radius: 24px;
+            opacity: 0.15; filter: blur(24px);
+            animation: pulseGlow 2.5s infinite ease-in-out;
+        }
+        .splash-logo {
+            position: relative; width: 100%; height: 100%;
+            background: var(--bg-glass); border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl); display: flex;
+            align-items: center; justify-content: center;
+            font-size: 32px; font-weight: 800; color: var(--accent);
+            box-shadow: var(--shadow-glow);
+            animation: fadeScale 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        .splash-title { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; animation: fadeUp 0.6s 0.2s ease forwards; opacity: 0; }
+        .splash-title span { color: var(--accent); }
+        .splash-tagline { font-size: 14px; color: var(--text-secondary); margin-top: 8px; animation: fadeUp 0.6s 0.35s ease forwards; opacity: 0; }
+        .splash-progress {
+            width: 120px; height: 3px; background: var(--bg-tertiary);
+            border-radius: var(--radius-full); margin-top: 32px; overflow: hidden;
+            animation: fadeUp 0.6s 0.5s ease forwards; opacity: 0;
+        }
+        .splash-progress-bar {
+            height: 100%; background: var(--accent); border-radius: var(--radius-full);
+            animation: progressFill 2s ease forwards;
+        }
+        .splash-skip {
+            position: absolute; bottom: 40px; font-size: 12px; color: var(--text-tertiary);
+            cursor: pointer; opacity: 0; animation: fadeUp 0.6s 1s ease forwards;
+            transition: color var(--transition-fast);
+        }
+        .splash-skip:hover { color: var(--text-secondary); }
+
+        /* ========== AUTH ========== */
+        #authScreen {
+            position: fixed; inset: 0; z-index: 1500;
+            background: var(--bg-primary);
+            display: none; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        #authScreen.active { display: flex; }
+        .auth-card {
+            width: 100%; max-width: 380px;
+            background: var(--bg-secondary); border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl); padding: 40px 32px;
+            animation: fadeScale 0.5s ease;
+        }
+        .auth-logo {
+            width: 56px; height: 56px; border-radius: var(--radius-lg);
+            background: var(--bg-glass); border: 1px solid var(--border-subtle);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; font-weight: 800; color: var(--accent);
+            margin: 0 auto 24px; box-shadow: var(--shadow-glow);
+        }
+        .auth-title { text-align: center; font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+        .auth-subtitle { text-align: center; font-size: 13px; color: var(--text-secondary); margin-bottom: 28px; }
+        .auth-form { display: flex; flex-direction: column; gap: 16px; }
+        .auth-form .input-group { margin-bottom: 0; }
+        .auth-hint { text-align: center; font-size: 12px; color: var(--text-tertiary); margin-top: 20px; }
+
+        /* ========== APP LAYOUT ========== */
+        .app { display: flex; height: 100vh; overflow: hidden; }
+        .sidebar-desktop {
+            width: var(--sidebar-width); flex-shrink: 0;
+            background: var(--bg-secondary); border-right: 1px solid var(--border-subtle);
+            display: none; flex-direction: column; overflow: hidden;
+        }
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+
+        @media (min-width: 1024px) {
+            .sidebar-desktop { display: flex; }
+            .mobile-only { display: none !important; }
+        }
+        @media (max-width: 1023px) {
+            .desktop-only { display: none !important; }
+        }
+
+        /* ========== SIDEBAR CONTENT ========== */
+        .sidebar-header {
+            padding: 16px; border-bottom: 1px solid var(--border-subtle);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .sidebar-brand {
+            display: flex; align-items: center; gap: 10px; flex: 1;
+        }
+        .sidebar-brand-icon {
+            width: 32px; height: 32px; border-radius: var(--radius-md);
+            background: var(--bg-glass); border: 1px solid var(--border-subtle);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: 800; color: var(--accent);
+        }
+        .sidebar-brand-text { font-size: 15px; font-weight: 700; }
+        .sidebar-brand-sub { font-size: 11px; color: var(--text-tertiary); font-weight: 500; }
+        .sidebar-new-chat {
+            margin: 12px 16px;
+        }
+        .sidebar-new-chat .btn { width: 100%; }
+        .sidebar-search {
+            padding: 0 16px 12px;
+        }
+        .sidebar-search .input {
+            padding-left: 36px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2352525b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: 12px center;
+        }
+        .sidebar-scroll { flex: 1; overflow-y: auto; padding: 0 12px 12px; }
+        .chat-history-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 9px 12px; border-radius: var(--radius-md);
+            cursor: pointer; transition: all var(--transition-fast);
+            margin-bottom: 2px; position: relative;
+        }
+        .chat-history-item:hover { background: var(--bg-glass); }
+        .chat-history-item.active { background: var(--accent-glow-soft); }
+        .chat-history-item.active .chat-history-title { color: var(--accent); }
+        .chat-history-icon { width: 16px; height: 16px; color: var(--text-tertiary); flex-shrink: 0; }
+        .chat-history-title { flex: 1; font-size: 13px; font-weight: 500; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .chat-history-item:hover .chat-history-actions { opacity: 1; }
+        .chat-history-actions {
+            display: flex; gap: 2px; opacity: 0; transition: opacity var(--transition-fast);
+        }
+        .chat-history-actions button {
+            width: 24px; height: 24px; border-radius: var(--radius-sm);
+            background: none; border: none; color: var(--text-tertiary);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .chat-history-actions button:hover { background: var(--bg-glass); color: var(--text-primary); }
+        .pinned .chat-history-icon { color: var(--accent); }
+        .sidebar-divider { height: 1px; background: var(--border-subtle); margin: 8px 12px; }
+
+        /* ========== HEADER ========== */
+        .header {
+            height: var(--header-height); flex-shrink: 0;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 16px; border-bottom: 1px solid var(--border-subtle);
+            background: rgba(var(--bg-primary), 0.8); backdrop-filter: blur(20px);
+        }
+        .header-left, .header-right { display: flex; align-items: center; gap: 8px; }
+        .header-title { font-size: 15px; font-weight: 700; }
+        .header-subtitle { font-size: 12px; color: var(--text-tertiary); display: flex; align-items: center; gap: 6px; }
+        .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); box-shadow: 0 0 8px var(--success); animation: pulse 2s infinite; }
+        .status-dot.offline { background: var(--text-tertiary); box-shadow: none; animation: none; }
+
+        /* ========== CHAT AREA ========== */
+        .chat-scroll {
+            flex: 1; overflow-y: auto; overflow-x: hidden;
+            padding: 16px; scroll-behavior: smooth;
+        }
+        .chat-empty {
+            height: 100%; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; text-align: center;
+            padding: 40px 20px; animation: fadeUp 0.5s ease;
+        }
+        .chat-empty-logo {
+            width: 64px; height: 64px; border-radius: var(--radius-xl);
+            background: var(--bg-glass); border: 1px solid var(--border-subtle);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; font-weight: 800; color: var(--accent);
+            margin-bottom: 20px; box-shadow: var(--shadow-glow);
+        }
+        .chat-empty-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+        .chat-empty-subtitle { font-size: 14px; color: var(--text-secondary); max-width: 400px; line-height: 1.6; margin-bottom: 28px; }
+        .quick-actions-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+            width: 100%; max-width: 480px;
+        }
+        .quick-action-card {
+            background: var(--bg-glass); border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg); padding: 16px;
+            cursor: pointer; transition: all var(--transition-fast);
+            text-align: left;
+        }
+        .quick-action-card:hover {
+            background: var(--bg-glass-hover); border-color: var(--border-medium);
+            transform: translateY(-2px);
+        }
+        .quick-action-icon {
+            width: 36px; height: 36px; border-radius: var(--radius-md);
+            background: var(--bg-glass); border: 1px solid var(--border-subtle);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 10px; color: var(--accent);
+        }
+        .quick-action-icon svg { width: 18px; height: 18px; }
+        .quick-action-label { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+        .quick-action-desc { font-size: 12px; color: var(--text-tertiary); }
+
+        /* Messages */
+        .message { display: flex; gap: 12px; margin-bottom: 20px; animation: fadeUp 0.35s ease forwards; }
+        .message.user { flex-direction: row-reverse; }
+        .message-bubble {
+            max-width: min(85%, 720px); padding: 14px 18px;
+            border-radius: var(--radius-lg); font-size: 14.5px;
+            line-height: 1.65; word-wrap: break-word;
+        }
+        .message-bubble.ai {
+            background: var(--bg-glass); backdrop-filter: blur(12px);
+            border: 1px solid var(--border-subtle);
+            border-top-left-radius: 4px; color: var(--text-primary);
+        }
+        .message-bubble.user {
+            background: var(--accent); color: #fff;
+            border-top-right-radius: 4px;
+        }
+        .message-bubble pre {
+            background: rgba(0,0,0,0.3); padding: 14px; border-radius: var(--radius-md);
+            overflow-x: auto; margin: 10px 0; font-family: 'JetBrains Mono', monospace;
+            font-size: 13px; line-height: 1.5;
+        }
+        [data-theme="light"] .message-bubble pre { background: rgba(0,0,0,0.06); }
+        .message-bubble pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+        .message-bubble code {
+            background: rgba(0,0,0,0.25); padding: 2px 6px; border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace; font-size: 13px;
+        }
+        [data-theme="light"] .message-bubble code { background: rgba(0,0,0,0.08); }
+        .message-bubble p { margin: 0 0 10px; }
+        .message-bubble p:last-child { margin-bottom: 0; }
+        .message-bubble strong { font-weight: 600; }
+        .message-bubble em { color: var(--text-secondary); font-style: italic; }
+        .message-bubble a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-glow-soft); }
+        .message-bubble a:hover { border-bottom-color: var(--accent); }
+        .message-bubble ul, .message-bubble ol { margin: 8px 0; padding-left: 20px; }
+        .message-bubble li { margin: 4px 0; }
+        .message-bubble blockquote {
+            border-left: 3px solid var(--accent); padding-left: 14px;
+            margin: 10px 0; color: var(--text-secondary); font-style: italic;
+        }
+        .message-bubble h1, .message-bubble h2, .message-bubble h3 { margin: 14px 0 8px; font-weight: 700; }
+        .message-bubble h1 { font-size: 18px; }
+        .message-bubble h2 { font-size: 16px; }
+        .message-bubble h3 { font-size: 15px; }
+        .message-bubble table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+        .message-bubble th, .message-bubble td { padding: 8px 12px; border: 1px solid var(--border-subtle); text-align: left; }
+        .message-bubble th { background: var(--bg-glass); font-weight: 600; }
+
+        /* Code block with copy */
+        .code-block { position: relative; margin: 10px 0; }
+        .code-block-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 14px; background: rgba(0,0,0,0.4);
+            border-radius: var(--radius-md) var(--radius-md) 0 0;
+            font-size: 12px; font-weight: 500; color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        [data-theme="light"] .code-block-header { background: rgba(0,0,0,0.08); }
+        .code-block pre { margin: 0; border-radius: 0 0 var(--radius-md) var(--radius-md); }
+        .code-copy-btn {
+            background: none; border: none; color: var(--text-tertiary);
+            cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 4px;
+            transition: color var(--transition-fast);
+        }
+        .code-copy-btn:hover { color: var(--text-primary); }
+
+        /* Message actions */
+        .msg-actions {
+            display: flex; gap: 4px; margin-top: 8px; opacity: 0;
+            transition: opacity var(--transition-fast);
+        }
+        .message:hover .msg-actions { opacity: 1; }
+        .msg-action-btn {
+            width: 28px; height: 28px; border-radius: var(--radius-sm);
+            background: var(--bg-glass); border: 1px solid var(--border-subtle);
+            color: var(--text-tertiary); display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all var(--transition-fast);
+        }
+        .msg-action-btn:hover { background: var(--bg-glass-hover); color: var(--text-primary); }
+        .msg-action-btn svg { width: 14px; height: 14px; }
+
+        /* Typing indicator */
+        .typing-indicator {
+            display: flex; align-items: center; gap: 6px; height: 24px; padding: 0 4px;
+        }
+        .typing-indicator span { font-size: 12px; color: var(--text-tertiary); }
+        .typing-dot {
+            width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+            animation: typingBounce 1.4s infinite ease-in-out both;
+        }
+        .typing-dot:nth-child(2) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(3) { animation-delay: -0.16s; }
+
+        /* Thinking animation */
+        .thinking-block {
+            background: var(--bg-glass); border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md); padding: 12px 16px; margin-bottom: 12px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .thinking-block svg { width: 16px; height: 16px; color: var(--accent); animation: spin 2s linear infinite; }
+        .thinking-block-text { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+
+        /* ========== INPUT AREA ========== */
+        .input-area {
+            flex-shrink: 0; padding: 12px 16px 16px;
+            background: linear-gradient(to top, var(--bg-primary), transparent);
+            border-top: 1px solid var(--border-subtle);
+        }
+        .input-box {
+            display: flex; align-items: flex-end; gap: 8px;
+            background: var(--bg-secondary); border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl); padding: 8px 8px 8px 14px;
+            transition: all var(--transition-fast);
+            max-width: 800px; margin: 0 auto;
+        }
+        .input-box:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow-soft), var(--shadow-glow);
+        }
+        .input-attach {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: none; border: none; color: var(--text-tertiary);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; flex-shrink: 0; transition: all var(--transition-fast);
+        }
+        .input-attach:hover { color: var(--accent); background: var(--accent-glow-soft); }
+        .input-field {
+            flex: 1; background: transparent; border: none; color: var(--text-primary);
+            font-size: 15px; font-family: inherit; resize: none; outline: none;
+            padding: 8px 0; line-height: 1.5; max-height: 120px; min-height: 24px;
+        }
+        .input-field::placeholder { color: var(--text-tertiary); }
+        .input-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+        .input-voice {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: none; border: none; color: var(--text-tertiary);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all var(--transition-fast);
+        }
+        .input-voice:hover { color: var(--accent); background: var(--accent-glow-soft); }
+        .input-voice.recording { color: var(--error); animation: pulse 1s infinite; }
+        .input-send {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: var(--accent); border: none; color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; flex-shrink: 0; transition: all var(--transition-fast);
+            box-shadow: 0 0 12px var(--accent-glow-soft);
+        }
+        .input-send:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 0 20px var(--accent-glow); }
+        .input-send:active:not(:disabled) { transform: scale(0.95); }
+        .input-send:disabled { background: var(--bg-tertiary); box-shadow: none; cursor: not-allowed; }
+        .input-hint {
+            text-align: center; font-size: 11px; color: var(--text-tertiary);
+            margin-top: 8px;
+        }
+        .input-hint a { color: var(--accent); text-decoration: none; }
+
+        /* Attachment menu */
+        .attach-menu {
+            position: absolute; bottom: calc(100% + 8px); left: 0;
+            background: var(--bg-secondary); border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg); padding: 6px;
+            box-shadow: var(--shadow-md); min-width: 180px;
+            display: none; animation: fadeScale 0.2s ease;
+            z-index: 100;
+        }
+        .attach-menu.active { display: block; }
+        .attach-menu-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; border-radius: var(--radius-md);
+            cursor: pointer; font-size: 13px; font-weight: 500;
+            color: var(--text-secondary); transition: all var(--transition-fast);
+        }
+        .attach-menu-item:hover { background: var(--bg-glass); color: var(--text-primary); }
+        .attach-menu-item svg { width: 16px; height: 16px; color: var(--text-tertiary); }
+
+        /* File preview */
+        .file-preview {
+            display: flex; align-items: center; gap: 10px;
+            background: var(--bg-glass); border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md); padding: 8px 12px; margin-bottom: 8px;
+            max-width: 800px; margin-left: auto; margin-right: auto;
+        }
+        .file-preview-icon { width: 32px; height: 32px; border-radius: var(--radius-sm); background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; color: var(--accent); }
+        .file-preview-info { flex: 1; min-width: 0; }
+        .file-preview-name { font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .file-preview-size { font-size: 11px; color: var(--text-tertiary); }
+        .file-preview-remove { width: 24px; height: 24px; border-radius: var(--radius-sm); background: none; border: none; color: var(--text-tertiary); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .file-preview-remove:hover { color: var(--error); background: rgba(239,68,68,0.1); }
+
+        /* Voice wave */
+        .voice-wave {
+            display: flex; align-items: center; gap: 3px; height: 24px;
+        }
+        .voice-wave-bar {
+            width: 3px; background: var(--accent); border-radius: var(--radius-full);
+            animation: wave 0.8s ease-in-out infinite;
+        }
+        .voice-wave-bar:nth-child(1) { height: 8px; animation-delay: 0s; }
+        .voice-wave-bar:nth-child(2) { height: 16px; animation-delay: 0.1s; }
+        .voice-wave-bar:nth-child(3) { height: 12px; animation-delay: 0.2s; }
+        .voice-wave-bar:nth-child(4) { height: 20px; animation-delay: 0.3s; }
+        .voice-wave-bar:nth-child(5) { height: 10px; animation-delay: 0.15s; }
+
+        /* ========== SCROLL TO BOTTOM ========== */
+        .scroll-bottom {
+            position: fixed; bottom: 90px; right: 20px;
+            width: 40px; height: 40px; border-radius: 50%;
+            background: var(--bg-secondary); border: 1px solid var(--border-subtle);
+            color: var(--text-secondary); display: none; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 50; box-shadow: var(--shadow-md);
+            transition: all var(--transition-fast);
+        }
+        .scroll-bottom.visible { display: flex; }
+        .scroll-bottom:hover { color: var(--text-primary); transform: scale(1.1); border-color: var(--border-medium); }
+
+        /* ========== SETTINGS / PROFILE CARDS ========== */
+        .setting-card {
+            background: var(--bg-glass); border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg); padding: 20px; margin-bottom: 16px;
+        }
+        .setting-card-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }
+        .setting-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 0; border-bottom: 1px solid var(--border-subtle);
+        }
+        .setting-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .setting-row:first-child { padding-top: 0; }
+        .setting-info { flex: 1; min-width: 0; margin-right: 16px; }
+        .setting-label { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+        .setting-desc { font-size: 12px; color: var(--text-tertiary); }
+
+        /* Mode cards */
+        .mode-card {
+            display: flex; align-items: center; gap: 14px;
+            padding: 16px; background: var(--bg-glass);
+            border: 1.5px solid transparent; border-radius: var(--radius-lg);
+            cursor: pointer; transition: all var(--transition-fast);
+            margin-bottom: 10px;
+        }
+        .mode-card:hover { background: var(--bg-glass-hover); }
+        .mode-card.active { border-color: var(--accent); background: var(--accent-glow-soft); }
+        .mode-card-icon {
+            width: 44px; height: 44px; border-radius: var(--radius-md);
+            display: flex; align-items: center; justify-content: center;
+            background: var(--bg-tertiary); color: var(--text-secondary);
+        }
+        .mode-card.active .mode-card-icon { background: var(--accent-glow-soft); color: var(--accent); }
+        .mode-card-info { flex: 1; }
+        .mode-card-title { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+        .mode-card-desc { font-size: 12px; color: var(--text-tertiary); }
+        .mode-card-check {
+            width: 22px; height: 22px; border-radius: 50%;
+            border: 2px solid var(--border-medium); display: flex;
+            align-items: center; justify-content: center; flex-shrink: 0;
+            transition: all var(--transition-fast); color: transparent; font-size: 12px;
+        }
+        .mode-card.active .mode-card-check { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+        /* Provider badge */
+        .provider-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 10px; border-radius: var(--radius-full);
+            font-size: 12px; font-weight: 600; background: var(--bg-glass);
+            border: 1px solid var(--border-subtle); color: var(--text-secondary);
+        }
+        .provider-badge.detected { background: var(--accent-glow-soft); color: var(--accent); border-color: rgba(59,130,246,0.2); }
+
+        /* Feature grid */
+        .feature-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+        }
+        .feature-item {
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+            padding: 12px 8px; border-radius: var(--radius-md);
+            background: var(--bg-glass); border: 1px solid var(--border-subtle);
+            transition: all var(--transition-fast);
+        }
+        .feature-item.disabled { opacity: 0.35; }
+        .feature-item:not(.disabled):hover { background: var(--bg-glass-hover); border-color: var(--border-medium); }
+        .feature-item svg { width: 20px; height: 20px; color: var(--accent); }
+        .feature-item.disabled svg { color: var(--text-tertiary); }
+        .feature-item-label { font-size: 11px; font-weight: 500; color: var(--text-secondary); text-align: center; }
+        .feature-item.disabled .feature-item-label { color: var(--text-tertiary); }
+
+        /* Model list */
+        .model-list { max-height: 300px; overflow-y: auto; }
+        .model-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; border-radius: var(--radius-md);
+            cursor: pointer; transition: all var(--transition-fast);
+            border: 1.5px solid transparent;
+        }
+        .model-item:hover { background: var(--bg-glass); }
+        .model-item.active { border-color: var(--accent); background: var(--accent-glow-soft); }
+        .model-item-name { flex: 1; font-size: 13px; font-weight: 500; }
+        .model-item-id { font-size: 11px; color: var(--text-tertiary); font-family: 'JetBrains Mono', monospace; }
+
+        /* ========== LIBRARY / PROJECTS ========== */
+        .content-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px;
+            padding: 16px;
+        }
+        .content-card {
+            background: var(--bg-glass); border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg); padding: 16px; cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .content-card:hover { background: var(--bg-glass-hover); transform: translateY(-2px); border-color: var(--border-medium); }
+        .content-card-icon { width: 40px; height: 40px; border-radius: var(--radius-md); background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; color: var(--accent); }
+        .content-card-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+        .content-card-desc { font-size: 12px; color: var(--text-tertiary); }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 640px) {
+            .quick-actions-grid { grid-template-columns: 1fr; }
+            .feature-grid { grid-template-columns: repeat(2, 1fr); }
+            .modal { max-width: 100%; }
+            .chat-empty-title { font-size: 20px; }
+            .message-bubble { max-width: 92%; padding: 12px 14px; font-size: 14px; }
+        }
+
+        /* ========== SVG ICONS BASE ========== */
+        .icon { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; flex-shrink: 0; }
+        .icon-sm { width: 16px; height: 16px; stroke-width: 2; }
+        .icon-lg { width: 24px; height: 24px; stroke-width: 2; }
+    </style>
+</head>
+<body>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Splash Screen -->
+    <div id="splash">
+        <div class="splash-logo-wrap">
+            <div class="splash-logo-glow"></div>
+            <div class="splash-logo">K</div>
+        </div>
+        <div class="splash-title">Kyro <span>AI</span></div>
+        <div class="splash-tagline">Powered by Synapse</div>
+        <div class="splash-progress">
+            <div class="splash-progress-bar"></div>
+        </div>
+        <div class="splash-skip" onclick="skipSplash()">Tap to continue</div>
+    </div>
+
+    <!-- Auth Screen -->
+    <div id="authScreen">
+        <div class="auth-card">
+            <div class="auth-logo">K</div>
+            <div class="auth-title">Welcome to Kyro AI</div>
+            <div class="auth-subtitle">Create your local account</div>
+            <div class="auth-form">
+                <div class="input-group">
+                    <input type="text" class="input" id="authUsername" placeholder="Username" autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <input type="password" class="input" id="authPassword" placeholder="Password">
+                    <button class="input-suffix" onclick="toggleAuthPassword()">
+                        <svg class="icon-sm" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                </div>
+                <button class="btn btn-primary" onclick="createAccount()" id="authBtn">
+                    <span>Get Started</span>
+                    <svg class="icon-sm" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                </button>
+            </div>
+            <div class="auth-hint">Your data stays on this device. No cloud login required.</div>
+        </div>
+    </div>
+
+    <!-- Drawer Overlay -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+    <div class="drawer" id="drawer">
+        <div class="drawer-header">
+            <div class="sidebar-brand">
+                <div class="sidebar-brand-icon">K</div>
+                <div>
+                    <div class="sidebar-brand-text">Kyro AI</div>
+                    <div class="sidebar-brand-sub">Powered by Synapse</div>
+                </div>
+            </div>
+            <button class="btn btn-ghost btn-icon" onclick="closeDrawer()">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+        </div>
+        <div class="drawer-content">
+            <div class="sidebar-new-chat">
+                <button class="btn btn-primary" onclick="newChat(); closeDrawer();">
+                    <svg class="icon-sm" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                    <span>New Chat</span>
+                </button>
+            </div>
+            <div class="sidebar-search">
+                <input type="text" class="input" id="sidebarSearch" placeholder="Search chats..." oninput="searchChats()">
+            </div>
+            <div class="drawer-section">
+                <div class="drawer-section-title">Chats</div>
+                <div id="drawerChatList"></div>
+            </div>
+            <div class="sidebar-divider"></div>
+            <div class="drawer-section">
+                <div class="drawer-section-title">Workspace</div>
+                <div class="drawer-item" onclick="showPage('library'); closeDrawer();">
+                    <svg viewBox="0 0 24 24"><path d="m19 11-8-8-8.6 8.6a2 2 0 0 0 0 2.8l5.2 5.2c.8.8 2 .8 2.8 0L19 11Z"/><path d="m5 2 5 5"/><path d="M2 13h15"/><path d="M22 20a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"/></svg>
+                    <span>Library</span>
+                </div>
+                <div class="drawer-item" onclick="showPage('projects'); closeDrawer();">
+                    <svg viewBox="0 0 24 24"><path d="M11 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10"/><path d="m13.5 14.5 2-2"/><path d="m15.5 12.5 2 2"/><circle cx="18" cy="18" r="3"/></svg>
+                    <span>Projects</span>
+                </div>
+                <div class="drawer-item" onclick="showPage('plugins'); closeDrawer();">
+                    <svg viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                    <span>Plugins</span>
+                </div>
+                <div class="drawer-item" onclick="showPage('tools'); closeDrawer();">
+                    <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                    <span>Tools</span>
+                </div>
+            </div>
+            <div class="sidebar-divider"></div>
+            <div class="drawer-section">
+                <div class="drawer-section-title">Settings</div>
+                <div class="drawer-item" onclick="openSettings(); closeDrawer();">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span>Settings</span>
+                </div>
+                <div class="drawer-item" onclick="openProfile(); closeDrawer();">
+                    <svg viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span>Profile</span>
+                </div>
+                <div class="drawer-item" onclick="showPage('language'); closeDrawer();">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    <span>Language</span>
+                </div>
+                <div class="drawer-item" onclick="showPage('backup'); closeDrawer();">
+                    <svg viewBox="0 0 24 24"><path d="M12 2v20"/><path d="m17 7-5-5-5 5"/><path d="m17 17-5 5-5-5"/></svg>
+                    <span>Backup & Restore</span>
+                </div>
+                <div class="drawer-item" onclick="showPage('about'); closeDrawer();">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                    <span>About</span>
+                </div>
+            </div>
+        </div>
+        <div class="drawer-footer">
+            <div style="font-size: 11px; color: var(--text-tertiary);">Kyro AI v2.0</div>
+            <div style="font-size: 12px; color: var(--text-secondary); font-weight: 600; margin-top: 2px;">Powered by Synapse</div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div class="app" id="app" style="display:none;">
+        <!-- Desktop Sidebar -->
+        <div class="sidebar-desktop">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <div class="sidebar-brand-icon">K</div>
+                    <div>
+                        <div class="sidebar-brand-text">Kyro AI</div>
+                        <div class="sidebar-brand-sub">Powered by Synapse</div>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-new-chat">
+                <button class="btn btn-primary" onclick="newChat()">
+                    <svg class="icon-sm" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                    <span>New Chat</span>
+                </button>
+            </div>
+            <div class="sidebar-search">
+                <input type="text" class="input" id="desktopSearch" placeholder="Search chats..." oninput="searchChats()">
+            </div>
+            <div class="sidebar-scroll" id="desktopChatList"></div>
+            <div style="padding: 12px; border-top: 1px solid var(--border-subtle);">
+                <div class="drawer-item" onclick="openSettings()">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span>Settings</span>
+                </div>
+                <div class="drawer-item" onclick="openProfile()">
+                    <svg viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span>Profile</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <button class="btn btn-ghost btn-icon mobile-only" onclick="openDrawer()">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M4 12h16"/><path d="M4 18h16"/><path d="M4 6h16"/></svg>
+                    </button>
+                    <div>
+                        <div class="header-title" id="headerTitle">Kyro AI</div>
+                        <div class="header-subtitle">
+                            <span class="status-dot" id="statusDot"></span>
+                            <span id="statusText">Kyro Thinking</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="btn btn-ghost btn-icon" onclick="openSettings()" title="Settings">
+                        <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    </button>
+                    <button class="btn btn-ghost btn-icon" onclick="openProfile()" title="Profile">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Chat Scroll Area -->
+            <div class="chat-scroll" id="chatScroll"></div>
+
+            <!-- Scroll to Bottom -->
+            <button class="scroll-bottom" id="scrollBottom" onclick="scrollToBottom()">
+                <svg class="icon" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <div id="filePreviewArea"></div>
+                <div style="position: relative; max-width: 800px; margin: 0 auto;">
+                    <div class="input-box">
+                        <button class="input-attach" id="attachBtn" onclick="toggleAttachMenu()">
+                            <svg class="icon-lg" viewBox="0 0 24 24" style="stroke-width:1.5"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                        </button>
+                        <div class="attach-menu" id="attachMenu">
+                            <div class="attach-menu-item" onclick="triggerFileInput('image')">
+                                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                                <span>Image</span>
+                            </div>
+                            <div class="attach-menu-item" onclick="triggerFileInput('file')">
+                                <svg viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                <span>Document</span>
+                            </div>
+                            <div class="attach-menu-item" onclick="triggerFileInput('pdf')">
+                                <svg viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M9 13v-1h6v1"/><path d="M11 13v6"/><path d="M9 17h4"/></svg>
+                                <span>PDF</span>
+                            </div>
+                            <div class="attach-menu-item" onclick="triggerFileInput('audio')">
+                                <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                                <span>Audio</span>
+                            </div>
+                            <div class="attach-menu-item" onclick="triggerFileInput('video')">
+                                <svg viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
+                                <span>Video</span>
+                            </div>
+                        </div>
+                        <textarea class="input-field" id="messageInput" placeholder="Ask Kyro anything..." rows="1" onkeydown="handleKeyDown(event)" oninput="autoResize(this)"></textarea>
+                        <div class="input-actions">
+                            <button class="input-voice" id="voiceBtn" onclick="toggleVoice()" title="Voice input">
+                                <svg class="icon-lg" viewBox="0 0 24 24" style="stroke-width:1.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                            </button>
+                            <button class="input-send" id="sendBtn" onclick="sendMessage()">
+                                <svg class="icon" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-hint">
+                    <span id="inputHintText">Kyro AI can make mistakes. Powered by Synapse.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Inputs -->
+    <input type="file" id="fileInput" style="display:none" onchange="handleFileSelect(event)">
+    <input type="file" id="imageInput" style="display:none" accept="image/*" onchange="handleFileSelect(event)">
+    <input type="file" id="pdfInput" style="display:none" accept=".pdf" onchange="handleFileSelect(event)">
+    <input type="file" id="audioInput" style="display:none" accept="audio/*" onchange="handleFileSelect(event)">
+    <input type="file" id="videoInput" style="display:none" accept="video/*" onchange="handleFileSelect(event)">
+    <input type="file" id="restoreInput" style="display:none" accept=".kyro" onchange="handleRestore(event)">
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Settings</div>
+                <button class="btn btn-ghost btn-icon" onclick="closeSettings()">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-card">
+                    <div class="setting-card-title">AI Mode</div>
+                    <div class="mode-card active" id="modeDemo" onclick="selectMode('demo')">
+                        <div class="mode-card-icon">
+                            <svg class="icon-lg" viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                        </div>
+                        <div class="mode-card-info">
+                            <div class="mode-card-title">Demo Mode</div>
+                            <div class="mode-card-desc">Free - No API key required</div>
+                        </div>
+                        <div class="mode-card-check" id="checkDemo">&#10003;</div>
+                    </div>
+                    <div class="mode-card" id="modeApi" onclick="selectMode('api')">
+                        <div class="mode-card-icon">
+                            <svg class="icon-lg" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                        </div>
+                        <div class="mode-card-info">
+                            <div class="mode-card-title">Kyro Thinking</div>
+                            <div class="mode-card-desc">Real AI - Connect your API key</div>
+                        </div>
+                        <div class="mode-card-check" id="checkApi"></div>
+                    </div>
+                </div>
+
+                <div class="setting-card" id="apiSettings" style="display:none;">
+                    <div class="setting-card-title">API Configuration</div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="font-size: 13px; font-weight: 500; margin-bottom: 6px; display: block;">API Key</label>
+                        <div class="input-group">
+                            <input type="password" class="input" id="apiKeyInput" placeholder="Paste your API key..." oninput="detectProvider()">
+                            <button class="input-suffix" onclick="toggleKeyVisibility()">
+                                <svg class="icon-sm" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </button>
+                        </div>
+                        <div style="margin-top: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <span class="provider-badge" id="providerBadge">Auto-detecting...</span>
+                            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="fetchModels()" id="fetchModelsBtn">
+                                <span>Fetch Models</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="font-size: 13px; font-weight: 500; margin-bottom: 6px; display: block;">Model</label>
+                        <div class="model-list" id="modelList"></div>
+                    </div>
+                    <div>
+                        <label style="font-size: 13px; font-weight: 500; margin-bottom: 8px; display: block;">Capabilities</label>
+                        <div class="feature-grid" id="featureGrid"></div>
+                    </div>
+                </div>
+
+                <div class="setting-card">
+                    <div class="setting-card-title">Appearance</div>
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <div class="setting-label">Dark Mode</div>
+                            <div class="setting-desc">Toggle between dark and light theme</div>
+                        </div>
+                        <div class="toggle active" id="themeToggle" onclick="toggleTheme()"></div>
+                    </div>
+                </div>
+
+                <div class="setting-card">
+                    <div class="setting-card-title">System</div>
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <div class="setting-label">System Prompt</div>
+                            <div class="setting-desc">Customize how Kyro behaves</div>
+                        </div>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="editSystemPrompt()">Edit</button>
+                    </div>
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <div class="setting-label">Language</div>
+                            <div class="setting-desc">Interface and chat language</div>
+                        </div>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="showPage('language')">Change</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+                <button class="btn btn-secondary" onclick="closeSettings()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal-overlay" id="profileModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Profile</div>
+                <button class="btn btn-ghost btn-icon" onclick="closeProfile()">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; margin-bottom: 24px;">
+                    <div class="avatar avatar-ai avatar-lg" style="margin: 0 auto 12px; width: 72px; height: 72px; font-size: 28px;">K</div>
+                    <div style="font-size: 18px; font-weight: 700;" id="profileName">User</div>
+                    <div style="font-size: 13px; color: var(--text-tertiary);" id="profileHandle">@user</div>
+                </div>
+                <div class="setting-card">
+                    <div class="setting-card-title">Account</div>
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <div class="setting-label">Username</div>
+                        </div>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="changeUsername()">Change</button>
+                    </div>
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <div class="setting-label">Password</div>
+                        </div>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="changePassword()">Change</button>
+                    </div>
+                </div>
+                <div class="setting-card">
+                    <div class="setting-card-title">Data</div>
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <div class="setting-label">Backup Data</div>
+                            <div class="setting-desc">Export encrypted .kyro file</div>
+                        </div>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="backupData()">Backup</button>
+                    </div>
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <div class="setting-label">Restore Data</div>
+                            <div class="setting-desc">Import from .kyro file</div>
+                        </div>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="restoreData()">Restore</button>
+                    </div>
+                </div>
+                <div class="setting-card">
+                    <div class="setting-card-title">About</div>
+                    <div style="text-align: center; padding: 16px 0;">
+                        <div style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">Kyro AI</div>
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">Version 2.0 - Powered by Synapse</div>
+                        <div style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px;">Founder</div>
+                        <div style="font-size: 14px; font-weight: 600; color: var(--accent);">Nitin Kushwanshi</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" style="flex: 1;" onclick="logout()">Logout</button>
+                <button class="btn btn-primary" style="flex: 1;" onclick="closeProfile()">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Prompt Modal -->
+    <div class="modal-overlay" id="systemPromptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">System Prompt</div>
+                <button class="btn btn-ghost btn-icon" onclick="closeSystemPrompt()">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <textarea class="input" id="systemPromptInput" rows="6" placeholder="Enter system prompt..."></textarea>
+                <div style="margin-top: 12px; font-size: 12px; color: var(--text-tertiary);">
+                    This prompt guides how Kyro responds to your messages.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="saveSystemPrompt()">Save</button>
+                <button class="btn btn-secondary" onclick="closeSystemPrompt()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Views (Library, Projects, etc.) -->
+    <div class="modal-overlay" id="pageModal" style="align-items: flex-start; padding: 0; background: var(--bg-primary);">
+        <div style="width: 100%; height: 100vh; display: flex; flex-direction: column; background: var(--bg-primary);" id="pageContent">
+            <div class="header">
+                <div class="header-left">
+                    <button class="btn btn-ghost btn-icon" onclick="closePage()">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+                    </button>
+                    <div class="header-title" id="pageTitle">Page</div>
+                </div>
+            </div>
+            <div class="chat-scroll" id="pageBody"></div>
+        </div>
+    </div>
+
+    <script>
+
+        // ========== STATE ==========
+        const STATE = {
+            user: null,
+            chats: [],
+            currentChatId: null,
+            settings: {
+                mode: 'demo',
+                apiKey: '',
+                provider: null,
+                model: null,
+                models: [],
+                features: {},
+                theme: 'dark',
+                language: 'en',
+                systemPrompt: 'You are Kyro AI, a helpful AI assistant powered by Synapse. Be concise, accurate, and helpful. Respond in the same language as the user.',
+                chatLanguage: 'auto'
+            },
+            isLoading: false,
+            isStreaming: false,
+            abortController: null,
+            recognition: null,
+            attachedFile: null
+        };
+
+        // ========== CONFIG ==========
+        const PROVIDERS = {
+            gemini: {
+                name: 'Google Gemini',
+                keyPattern: /^AIza[\w-]{35,}$/,
+                baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
+                modelsUrl: null,
+                chatEndpoint: '/models/{model}:generateContent',
+                streamEndpoint: '/models/{model}:streamGenerateContent',
+                headers: () => ({ 'Content-Type': 'application/json' }),
+                body: (messages, system) => ({
+                    contents: messages.map(m => ({
+                        role: m.role === 'assistant' ? 'model' : 'user',
+                        parts: [{ text: m.content }]
+                    })),
+                    generationConfig: { temperature: 0.7, maxOutputTokens: 8192 }
+                }),
+                parseStream: (line) => {
+                    try {
+                        const data = JSON.parse(line);
+                        return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                    } catch { return ''; }
+                },
+                parseResponse: (data) => data.candidates?.[0]?.content?.parts?.[0]?.text || '',
+                modelMap: {
+                    'gemini-2.5-flash': 'Kyro 2.5 Flash',
+                    'gemini-2.5-pro': 'Kyro 2.5 Pro',
+                    'gemini-2.0-flash': 'Kyro 2.0 Flash',
+                    'gemini-2.0-pro': 'Kyro 2.0 Pro',
+                    'gemini-1.5-flash': 'Kyro 1.5 Flash',
+                    'gemini-1.5-pro': 'Kyro 1.5 Pro',
+                    'gemini-1.0-pro': 'Kyro 1.0'
+                },
+                features: { chat: true, vision: true, streaming: true, code: true, reasoning: true, documents: true }
+            },
+            openai: {
+                name: 'OpenAI',
+                keyPattern: /^sk-[\w-]{40,}$/,
+                baseUrl: 'https://api.openai.com/v1',
+                modelsUrl: '/models',
+                chatEndpoint: '/chat/completions',
+                streamEndpoint: '/chat/completions',
+                headers: (key) => ({ 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' }),
+                body: (messages, system) => ({
+                    model: STATE.settings.model,
+                    messages: [{ role: 'system', content: system }, ...messages],
+                    temperature: 0.7,
+                    max_tokens: 8192,
+                    stream: true
+                }),
+                parseStream: (line) => {
+                    if (!line.startsWith('data: ')) return '';
+                    const data = line.slice(6);
+                    if (data === '[DONE]') return '';
+                    try {
+                        const json = JSON.parse(data);
+                        return json.choices?.[0]?.delta?.content || '';
+                    } catch { return ''; }
+                },
+                parseResponse: (data) => data.choices?.[0]?.message?.content || '',
+                modelMap: {
+                    'gpt-5': 'Kyro 5',
+                    'gpt-5-mini': 'Kyro 5 Mini',
+                    'gpt-4.1': 'Kyro 4.1',
+                    'gpt-4o': 'Kyro 4o',
+                    'gpt-4o-mini': 'Kyro 4o Mini',
+                    'gpt-4-turbo': 'Kyro 4 Turbo',
+                    'gpt-4': 'Kyro 4',
+                    'gpt-3.5-turbo': 'Kyro 3.5'
+                },
+                features: { chat: true, vision: true, streaming: true, code: true, reasoning: true, image: true, audio: true, documents: true, web: true }
+            },
+            anthropic: {
+                name: 'Anthropic Claude',
+                keyPattern: /^sk-ant-[\w-]{60,}$/,
+                baseUrl: 'https://api.anthropic.com/v1',
+                modelsUrl: '/models',
+                chatEndpoint: '/messages',
+                streamEndpoint: '/messages',
+                headers: (key) => ({ 'x-api-key': key, 'Content-Type': 'application/json', 'anthropic-version': '2023-06-01' }),
+                body: (messages, system) => ({
+                    model: STATE.settings.model,
+                    max_tokens: 8192,
+                    system: system,
+                    messages: messages.map(m => ({ role: m.role, content: m.content })),
+                    stream: true
+                }),
+                parseStream: (line) => {
+                    if (!line.startsWith('data: ')) return '';
+                    const data = line.slice(6);
+                    if (data === '[DONE]') return '';
+                    try {
+                        const json = JSON.parse(data);
+                        if (json.type === 'content_block_delta') return json.delta?.text || '';
+                        return '';
+                    } catch { return ''; }
+                },
+                parseResponse: (data) => data.content?.[0]?.text || '',
+                modelMap: {
+                    'claude-opus-4': 'Kyro Opus 4',
+                    'claude-sonnet-4': 'Kyro Sonnet 4',
+                    'claude-opus-3': 'Kyro Opus 3',
+                    'claude-sonnet-3-5': 'Kyro Sonnet 3.5',
+                    'claude-haiku-3-5': 'Kyro Haiku 3.5'
+                },
+                features: { chat: true, vision: true, streaming: true, code: true, reasoning: true, documents: true, web: true }
+            },
+            groq: {
+                name: 'Groq',
+                keyPattern: /^gsk_[\w-]{50,}$/,
+                baseUrl: 'https://api.groq.com/openai/v1',
+                modelsUrl: '/models',
+                chatEndpoint: '/chat/completions',
+                streamEndpoint: '/chat/completions',
+                headers: (key) => ({ 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' }),
+                body: (messages, system) => ({
+                    model: STATE.settings.model,
+                    messages: [{ role: 'system', content: system }, ...messages],
+                    temperature: 0.7,
+                    max_tokens: 8192,
+                    stream: true
+                }),
+                parseStream: (line) => {
+                    if (!line.startsWith('data: ')) return '';
+                    const data = line.slice(6);
+                    if (data === '[DONE]') return '';
+                    try {
+                        const json = JSON.parse(data);
+                        return json.choices?.[0]?.delta?.content || '';
+                    } catch { return ''; }
+                },
+                parseResponse: (data) => data.choices?.[0]?.message?.content || '',
+                modelMap: {
+                    'llama-3.3-70b-versatile': 'Kyro Llama 70B',
+                    'llama-3.1-8b-instant': 'Kyro Llama 8B',
+                    'mixtral-8x7b-32768': 'Kyro Mixtral',
+                    'gemma2-9b-it': 'Kyro Gemma 9B'
+                },
+                features: { chat: true, streaming: true, code: true, reasoning: true }
+            },
+            deepseek: {
+                name: 'DeepSeek',
+                keyPattern: /^sk-[\w-]{30,}$/,
+                baseUrl: 'https://api.deepseek.com/v1',
+                modelsUrl: '/models',
+                chatEndpoint: '/chat/completions',
+                streamEndpoint: '/chat/completions',
+                headers: (key) => ({ 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' }),
+                body: (messages, system) => ({
+                    model: STATE.settings.model,
+                    messages: [{ role: 'system', content: system }, ...messages],
+                    temperature: 0.7,
+                    max_tokens: 8192,
+                    stream: true
+                }),
+                parseStream: (line) => {
+                    if (!line.startsWith('data: ')) return '';
+                    const data = line.slice(6);
+                    if (data === '[DONE]') return '';
+                    try {
+                        const json = JSON.parse(data);
+                        return json.choices?.[0]?.delta?.content || '';
+                    } catch { return ''; }
+                },
+                parseResponse: (data) => data.choices?.[0]?.message?.content || '',
+                modelMap: {
+                    'deepseek-chat': 'Kyro Chat',
+                    'deepseek-reasoner': 'Kyro Reason',
+                    'deepseek-research': 'Kyro Research'
+                },
+                features: { chat: true, streaming: true, code: true, reasoning: true, web: true }
+            },
+            mistral: {
+                name: 'Mistral',
+                keyPattern: /^[\w-]{30,}$/,
+                baseUrl: 'https://api.mistral.ai/v1',
+                modelsUrl: '/models',
+                chatEndpoint: '/chat/completions',
+                streamEndpoint: '/chat/completions',
+                headers: (key) => ({ 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' }),
+                body: (messages, system) => ({
+                    model: STATE.settings.model,
+                    messages: [{ role: 'system', content: system }, ...messages],
+                    temperature: 0.7,
+                    max_tokens: 8192,
+                    stream: true
+                }),
+                parseStream: (line) => {
+                    if (!line.startsWith('data: ')) return '';
+                    const data = line.slice(6);
+                    if (data === '[DONE]') return '';
+                    try {
+                        const json = JSON.parse(data);
+                        return json.choices?.[0]?.delta?.content || '';
+                    } catch { return ''; }
+                },
+                parseResponse: (data) => data.choices?.[0]?.message?.content || '',
+                modelMap: {
+                    'mistral-large-latest': 'Kyro Large',
+                    'mistral-small-latest': 'Kyro Small',
+                    'codestral-latest': 'Kyro Code'
+                },
+                features: { chat: true, streaming: true, code: true, reasoning: true }
+            },
+            xai: {
+                name: 'xAI Grok',
+                keyPattern: /^xai-[\w-]{40,}$/,
+                baseUrl: 'https://api.x.ai/v1',
+                modelsUrl: '/models',
+                chatEndpoint: '/chat/completions',
+                streamEndpoint: '/chat/completions',
+                headers: (key) => ({ 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' }),
+                body: (messages, system) => ({
+                    model: STATE.settings.model,
+                    messages: [{ role: 'system', content: system }, ...messages],
+                    temperature: 0.7,
+                    max_tokens: 8192,
+                    stream: true
+                }),
+                parseStream: (line) => {
+                    if (!line.startsWith('data: ')) return '';
+                    const data = line.slice(6);
+                    if (data === '[DONE]') return '';
+                    try {
+                        const json = JSON.parse(data);
+                        return json.choices?.[0]?.delta?.content || '';
+                    } catch { return ''; }
+                },
+                parseResponse: (data) => data.choices?.[0]?.message?.content || '',
+                modelMap: {
+                    'grok-4': 'Kyro 4',
+                    'grok-4-fast': 'Kyro 4 Fast',
+                    'grok-3': 'Kyro 3'
+                },
+                features: { chat: true, vision: true, streaming: true, code: true, reasoning: true, web: true, image: true }
+            },
+            together: {
+                name: 'Together AI',
+                keyPattern: /^tgp_[\w-]{40,}$/,
+                baseUrl: 'https://api.together.xyz/v1',
+                modelsUrl: '/models',
+                chatEndpoint: '/chat/completions',
+                streamEndpoint: '/chat/completions',
+                headers: (key) => ({ 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' }),
+                body: (messages, system) => ({
+                    model: STATE.settings.model,
+                    messages: [{ role: 'system', content: system }, ...messages],
+                    temperature: 0.7,
+                    max_tokens: 8192,
+                    stream: true
+                }),
+                parseStream: (line) => {
+                    if (!line.startsWith('data: ')) return '';
+                    const data = line.slice(6);
+                    if (data === '[DONE]') return '';
+                    try {
+                        const json = JSON.parse(data);
+                        return json.choices?.[0]?.delta?.content || '';
+                    } catch { return ''; }
+                },
+                parseResponse: (data) => data.choices?.[0]?.message?.content || '',
+                modelMap: {},
+                features: { chat: true, streaming: true, code: true, image: true }
+            },
+            openrouter: {
+                name: 'OpenRouter',
+                keyPattern: /^sk-or-v1-[\w-]{40,}$/,
+                baseUrl: 'https://openrouter.ai/api/v1',
+                modelsUrl: '/models',
+                chatEndpoint: '/chat/completions',
+                streamEndpoint: '/chat/completions',
+                headers: (key) => ({ 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json', 'HTTP-Referer': location.href, 'X-Title': 'Kyro AI' }),
+                body: (messages, system) => ({
+                    model: STATE.settings.model,
+                    messages: [{ role: 'system', content: system }, ...messages],
+                    temperature: 0.7,
+                    max_tokens: 8192,
+                    stream: true
+                }),
+                parseStream: (line) => {
+                    if (!line.startsWith('data: ')) return '';
+                    const data = line.slice(6);
+                    if (data === '[DONE]') return '';
+                    try {
+                        const json = JSON.parse(data);
+                        return json.choices?.[0]?.delta?.content || '';
+                    } catch { return ''; }
+                },
+                parseResponse: (data) => data.choices?.[0]?.message?.content || '',
+                modelMap: {},
+                features: { chat: true, streaming: true, code: true, reasoning: true, web: true, image: true }
+            }
+        };
+
+        const FEATURES = [
+            { id: 'chat', label: 'Chat', icon: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>' },
+            { id: 'vision', label: 'Vision', icon: '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>' },
+            { id: 'ocr', label: 'OCR', icon: '<path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/>' },
+            { id: 'image', label: 'Image Gen', icon: '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/>' },
+            { id: 'code', label: 'Code', icon: '<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>' },
+            { id: 'reasoning', label: 'Reasoning', icon: '<path d="M12 2a10 10 0 1 0 10 10H12V2z"/><path d="M12 2a10 10 0 0 1 10 10"/><path d="M12 12 2.5 8.5"/>' },
+            { id: 'web', label: 'Web Search', icon: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>' },
+            { id: 'audio', label: 'Audio', icon: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>' },
+            { id: 'video', label: 'Video', icon: '<path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/>' },
+            { id: 'documents', label: 'Documents', icon: '<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/>' },
+            { id: 'streaming', label: 'Streaming', icon: '<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>' },
+            { id: 'function', label: 'Functions', icon: '<path d="M10 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10"/><path d="m9 14 2 2 4-4"/>' }
+        ];
+
+        const LANGUAGES = [
+            { code: 'en', name: 'English' },
+            { code: 'hi', name: 'Hindi' },
+            { code: 'hinglish', name: 'Hinglish' },
+            { code: 'ur', name: 'Urdu' },
+            { code: 'bn', name: 'Bengali' },
+            { code: 'ta', name: 'Tamil' },
+            { code: 'te', name: 'Telugu' },
+            { code: 'mr', name: 'Marathi' },
+            { code: 'gu', name: 'Gujarati' },
+            { code: 'pa', name: 'Punjabi' },
+            { code: 'kn', name: 'Kannada' },
+            { code: 'ml', name: 'Malayalam' },
+            { code: 'or', name: 'Odia' },
+            { code: 'as', name: 'Assamese' },
+            { code: 'ne', name: 'Nepali' },
+            { code: 'ar', name: 'Arabic' },
+            { code: 'fr', name: 'French' },
+            { code: 'de', name: 'German' },
+            { code: 'es', name: 'Spanish' },
+            { code: 'pt', name: 'Portuguese' },
+            { code: 'ru', name: 'Russian' },
+            { code: 'ja', name: 'Japanese' },
+            { code: 'ko', name: 'Korean' },
+            { code: 'zh', name: 'Chinese' }
+        ];
+
+        // ========== ENCRYPTION UTILS ==========
+        function encrypt(text, key) {
+            if (!text) return '';
+            let result = '';
+            for (let i = 0; i < text.length; i++) {
+                result += String.fromCharCode(text.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+            }
+            return btoa(result);
+        }
+        function decrypt(text, key) {
+            if (!text) return '';
+            try {
+                const decoded = atob(text);
+                let result = '';
+                for (let i = 0; i < decoded.length; i++) {
+                    result += String.fromCharCode(decoded.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+                }
+                return result;
+            } catch { return ''; }
+        }
+        function getEncKey() { return STATE.user?.password || 'kyro-default-key-2024'; }
+
+        // ========== STORAGE ==========
+        function saveState() {
+            if (!STATE.user) return;
+            const data = {
+                user: STATE.user,
+                chats: STATE.chats,
+                settings: {
+                    ...STATE.settings,
+                    apiKey: encrypt(STATE.settings.apiKey, getEncKey())
+                }
+            };
+            localStorage.setItem('kyro_data', JSON.stringify(data));
+        }
+
+        function loadState() {
+            const raw = localStorage.getItem('kyro_data');
+            if (!raw) return false;
+            try {
+                const data = JSON.parse(raw);
+                STATE.user = data.user;
+                STATE.chats = data.chats || [];
+                if (data.settings) {
+                    STATE.settings = { ...STATE.settings, ...data.settings };
+                    STATE.settings.apiKey = decrypt(data.settings.apiKey, getEncKey());
+                }
+                return true;
+            } catch { return false; }
+        }
+
+        // ========== SPLASH ==========
+        function skipSplash() {
+            document.getElementById('splash').classList.add('hidden');
+        }
+        setTimeout(() => skipSplash(), 2800);
+
+        // ========== AUTH ==========
+        function showAuth() {
+            document.getElementById('authScreen').classList.add('active');
+            document.getElementById('app').style.display = 'none';
+        }
+        function hideAuth() {
+            document.getElementById('authScreen').classList.remove('active');
+            document.getElementById('app').style.display = 'flex';
+        }
+        function toggleAuthPassword() {
+            const input = document.getElementById('authPassword');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+        function createAccount() {
+            const username = document.getElementById('authUsername').value.trim();
+            const password = document.getElementById('authPassword').value;
+            if (!username || !password) {
+                showToast('Please enter username and password', 'error');
+                return;
+            }
+            if (password.length < 4) {
+                showToast('Password must be at least 4 characters', 'error');
+                return;
+            }
+            STATE.user = { username, password, created: Date.now() };
+            saveState();
+            hideAuth();
+            initApp();
+            showToast('Welcome to Kyro AI, ' + username + '!');
+        }
+        function logout() {
+            if (!confirm('Logout and clear session?')) return;
+            STATE.user = null;
+            STATE.chats = [];
+            STATE.currentChatId = null;
+            localStorage.removeItem('kyro_data');
+            closeProfile();
+            showAuth();
+            showToast('Logged out successfully');
+        }
+
+        // ========== THEME ==========
+        function toggleTheme() {
+            const isDark = STATE.settings.theme === 'dark';
+            STATE.settings.theme = isDark ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', STATE.settings.theme);
+            document.getElementById('themeToggle').classList.toggle('active', !isDark);
+            saveState();
+            showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled');
+        }
+        function applyTheme() {
+            document.documentElement.setAttribute('data-theme', STATE.settings.theme);
+            document.getElementById('themeToggle').classList.toggle('active', STATE.settings.theme === 'dark');
+        }
+
+        // ========== DRAWER ==========
+        function openDrawer() {
+            document.getElementById('drawerOverlay').classList.add('active');
+            document.getElementById('drawer').classList.add('active');
+            renderChatList('drawerChatList');
+        }
+        function closeDrawer() {
+            document.getElementById('drawerOverlay').classList.remove('active');
+            document.getElementById('drawer').classList.remove('active');
+        }
+
+        // ========== TOAST ==========
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast' + (type === 'error' ? ' toast-error' : type === 'success' ? ' toast-success' : '');
+            toast.textContent = message;
+            container.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.add('show'));
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) translateY(20px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ========== INIT ==========
+        function init() {
+            if (loadState() && STATE.user) {
+                hideAuth();
+                initApp();
+            } else {
+                showAuth();
+            }
+        }
+
+        function initApp() {
+            applyTheme();
+            if (STATE.chats.length === 0) {
+                newChat();
+            } else {
+                loadChat(STATE.chats[0].id);
+            }
+            renderChatList('desktopChatList');
+            renderChatList('drawerChatList');
+            updateStatus();
+        }
+
+        function updateStatus() {
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+            if (STATE.settings.mode === 'demo') {
+                dot.className = 'status-dot';
+                text.textContent = 'Kyro Thinking (Demo)';
+            } else if (STATE.settings.provider) {
+                dot.className = 'status-dot';
+                text.textContent = 'Kyro Thinking (' + PROVIDERS[STATE.settings.provider].name + ')';
+            } else {
+                dot.className = 'status-dot offline';
+                text.textContent = 'Kyro Thinking (Offline)';
+            }
+        }
+
+        // ========== CHAT MANAGEMENT ==========
+        function newChat() {
+            const chat = {
+                id: 'chat_' + Date.now(),
+                title: 'New Chat',
+                messages: [],
+                pinned: false,
+                created: Date.now(),
+                updated: Date.now()
+            };
+            STATE.chats.unshift(chat);
+            STATE.currentChatId = chat.id;
+            saveState();
+            renderChat();
+            renderChatList('desktopChatList');
+            renderChatList('drawerChatList');
+            document.getElementById('messageInput').focus();
+        }
+
+        function loadChat(chatId) {
+            STATE.currentChatId = chatId;
+            renderChat();
+            renderChatList('desktopChatList');
+            renderChatList('drawerChatList');
+            closeDrawer();
+        }
+
+        function getCurrentChat() {
+            return STATE.chats.find(c => c.id === STATE.currentChatId);
+        }
+
+        function deleteChat(chatId, event) {
+            event?.stopPropagation();
+            if (!confirm('Delete this chat?')) return;
+            STATE.chats = STATE.chats.filter(c => c.id !== chatId);
+            if (STATE.currentChatId === chatId) {
+                STATE.currentChatId = STATE.chats.length > 0 ? STATE.chats[0].id : null;
+            }
+            saveState();
+            renderChat();
+            renderChatList('desktopChatList');
+            renderChatList('drawerChatList');
+        }
+
+        function pinChat(chatId, event) {
+            event?.stopPropagation();
+            const chat = STATE.chats.find(c => c.id === chatId);
+            if (chat) {
+                chat.pinned = !chat.pinned;
+                chat.updated = Date.now();
+                saveState();
+                renderChatList('desktopChatList');
+                renderChatList('drawerChatList');
+                showToast(chat.pinned ? 'Chat pinned' : 'Chat unpinned');
+            }
+        }
+
+        function renameChat(chatId, event) {
+            event?.stopPropagation();
+            const chat = STATE.chats.find(c => c.id === chatId);
+            if (!chat) return;
+            const name = prompt('Rename chat:', chat.title);
+            if (name && name.trim()) {
+                chat.title = name.trim();
+                saveState();
+                renderChatList('desktopChatList');
+                renderChatList('drawerChatList');
+            }
+        }
+
+        function duplicateChat(chatId, event) {
+            event?.stopPropagation();
+            const chat = STATE.chats.find(c => c.id === chatId);
+            if (!chat) return;
+            const newChat = {
+                ...chat,
+                id: 'chat_' + Date.now(),
+                title: chat.title + ' (Copy)',
+                created: Date.now(),
+                updated: Date.now()
+            };
+            STATE.chats.unshift(newChat);
+            STATE.currentChatId = newChat.id;
+            saveState();
+            renderChat();
+            renderChatList('desktopChatList');
+            renderChatList('drawerChatList');
+            showToast('Chat duplicated');
+        }
+
+        function searchChats() {
+            const query = (document.getElementById('sidebarSearch')?.value || document.getElementById('desktopSearch')?.value || '').toLowerCase();
+            renderChatList('desktopChatList', query);
+            renderChatList('drawerChatList', query);
+        }
+
+        function renderChatList(containerId, filter = '') {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const chats = STATE.chats
+                .filter(c => !filter || c.title.toLowerCase().includes(filter))
+                .sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || b.updated - a.updated);
+
+            if (chats.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-tertiary); font-size: 13px;">No chats yet</div>';
+                return;
+            }
+
+            container.innerHTML = chats.map(chat => `
+                <div class="chat-history-item ${chat.pinned ? 'pinned' : ''} ${chat.id === STATE.currentChatId ? 'active' : ''}" onclick="loadChat('${chat.id}')">
+                    <svg class="chat-history-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        ${chat.pinned
+                            ? '<path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>'
+                            : '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>'}
+                    </svg>
+                    <div class="chat-history-title">${escapeHtml(chat.title)}</div>
+                    <div class="chat-history-actions">
+                        <button onclick="pinChat('${chat.id}', event)" title="${chat.pinned ? 'Unpin' : 'Pin'}">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
+                        </button>
+                        <button onclick="renameChat('${chat.id}', event)" title="Rename">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                        </button>
+                        <button onclick="duplicateChat('${chat.id}', event)" title="Duplicate">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        </button>
+                        <button onclick="deleteChat('${chat.id}', event)" title="Delete">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ========== RENDER CHAT ==========
+        function renderChat() {
+            const chat = getCurrentChat();
+            const container = document.getElementById('chatScroll');
+            if (!chat || chat.messages.length === 0) {
+                showWelcomeScreen();
+                return;
+            }
+
+            document.getElementById('headerTitle').textContent = chat.title;
+            container.innerHTML = chat.messages.map((msg, index) => renderMessage(msg, index)).join('');
+            scrollToBottom();
+        }
+
+        function showWelcomeScreen() {
+            const container = document.getElementById('chatScroll');
+            document.getElementById('headerTitle').textContent = 'Kyro AI';
+            container.innerHTML = `
+                <div class="chat-empty">
+                    <div class="chat-empty-logo">K</div>
+                    <div class="chat-empty-title">How can I help you today?</div>
+                    <div class="chat-empty-subtitle">I can code, write, analyze, and answer questions. Just ask me anything.</div>
+                    <div class="quick-actions-grid">
+                        <div class="quick-action-card" onclick="quickAsk('Explain quantum computing in simple terms')">
+                            <div class="quick-action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></div>
+                            <div class="quick-action-label">Explain Topic</div>
+                            <div class="quick-action-desc">Learn anything simply</div>
+                        </div>
+                        <div class="quick-action-card" onclick="quickAsk('Write a Python function to sort a list')">
+                            <div class="quick-action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+                            <div class="quick-action-label">Code Help</div>
+                            <div class="quick-action-desc">Programming assistance</div>
+                        </div>
+                        <div class="quick-action-card" onclick="quickAsk('Write a professional email requesting time off')">
+                            <div class="quick-action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                            <div class="quick-action-label">Write Content</div>
+                            <div class="quick-action-desc">Emails, essays, stories</div>
+                        </div>
+                        <div class="quick-action-card" onclick="quickAsk('Analyze the pros and cons of remote work')">
+                            <div class="quick-action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h10"/><path d="M9 4v16"/><path d="m3 9 3 3-3 3"/><path d="M14 8V4h8v4"/><path d="M14 12h8"/><path d="M18 12v8"/></svg></div>
+                            <div class="quick-action-label">Analyze</div>
+                            <div class="quick-action-desc">Deep reasoning & logic</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderMessage(msg, index) {
+            const isUser = msg.role === 'user';
+            const isTyping = msg.isTyping;
+            const isThinking = msg.isThinking;
+            const avatar = isUser
+                ? `<div class="avatar avatar-user">${STATE.user?.username?.charAt(0).toUpperCase() || 'U'}</div>`
+                : `<div class="avatar avatar-ai">K</div>`;
+
+            if (isTyping) {
+                return `<div class="message">
+                    ${avatar}
+                    <div class="message-bubble ai">
+                        <div class="typing-indicator">
+                            <span>Thinking</span>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                        </div>
+                    </div>
+                </div>`;
+            }
+
+            if (isThinking) {
+                return `<div class="message">
+                    ${avatar}
+                    <div style="max-width: min(85%, 720px);">
+                        <div class="thinking-block">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/><path d="M12 2a10 10 0 0 1 10 10"/><path d="M12 12 2.5 8.5"/></svg>
+                            <span class="thinking-block-text">${escapeHtml(msg.content || 'Thinking...')}</span>
+                        </div>
+                    </div>
+                </div>`;
+            }
+
+            const content = isUser ? escapeHtml(msg.content) : parseMarkdown(msg.content);
+            const actions = !isUser ? `
+                <div class="msg-actions">
+                    <button class="msg-action-btn" onclick="copyMessage(${index})" title="Copy">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </button>
+                    <button class="msg-action-btn" onclick="regenerateMessage(${index})" title="Regenerate">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                    </button>
+                    <button class="msg-action-btn" onclick="readAloud(${index})" title="Read aloud">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                    </button>
+                    <button class="msg-action-btn" onclick="shareMessage(${index})" title="Share">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                    </button>
+                    <button class="msg-action-btn" onclick="deleteMessage(${index})" title="Delete">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </button>
+                </div>
+            ` : `
+                <div class="msg-actions">
+                    <button class="msg-action-btn" onclick="editMessage(${index})" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                    </button>
+                    <button class="msg-action-btn" onclick="deleteMessage(${index})" title="Delete">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </button>
+                </div>
+            `;
+
+            const bubbleClass = isUser ? 'message-bubble user' : 'message-bubble ai';
+            const bubbleContent = `<div class="${bubbleClass}">${content}${actions}</div>`;
+
+            if (isUser) {
+                return `<div class="message user">${bubbleContent}${avatar}</div>`;
+            }
+            return `<div class="message">${avatar}${bubbleContent}</div>`;
+        }
+
+        function quickAsk(text) {
+            document.getElementById('messageInput').value = text;
+            autoResize(document.getElementById('messageInput'));
+            sendMessage();
+        }
+
+        // ========== SEND MESSAGE ==========
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            if (!text || STATE.isLoading) return;
+
+            const chat = getCurrentChat();
+            if (!chat) newChat();
+
+            input.value = '';
+            input.style.height = 'auto';
+
+            // Add user message
+            const userMsg = { role: 'user', content: text, timestamp: Date.now() };
+            chat.messages.push(userMsg);
+            chat.updated = Date.now();
+
+            // Update title from first user message
+            if (chat.messages.filter(m => m.role === 'user').length === 1) {
+                chat.title = text.slice(0, 30) + (text.length > 30 ? '...' : '');
+            }
+
+            saveState();
+            renderChat();
+            renderChatList('desktopChatList');
+            renderChatList('drawerChatList');
+
+            STATE.isLoading = true;
+            document.getElementById('sendBtn').disabled = true;
+
+            // Show typing
+            chat.messages.push({ role: 'assistant', content: '', isTyping: true, timestamp: Date.now() });
+            renderChat();
+
+            try {
+                if (STATE.settings.mode === 'demo') {
+                    await sendDemoResponse(chat, text);
+                } else {
+                    await sendApiResponse(chat, text);
+                }
+            } catch (err) {
+                removeTyping(chat);
+                chat.messages.push({
+                    role: 'assistant',
+                    content: '**Error:** ' + err.message + '\n\nPlease check your API settings or switch to Demo Mode.',
+                    timestamp: Date.now()
+                });
+                renderChat();
+                showToast(err.message, 'error');
+            } finally {
+                STATE.isLoading = false;
+                document.getElementById('sendBtn').disabled = false;
+                saveState();
+            }
+        }
+
+        function removeTyping(chat) {
+            chat.messages = chat.messages.filter(m => !m.isTyping && !m.isThinking);
+        }
+
+        function handleKeyDown(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function autoResize(el) {
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+        }
+
+        // ========== DEMO MODE ==========
+        async function sendDemoResponse(chat, text) {
+            await new Promise(r => setTimeout(r, 800 + Math.random() * 1000));
+            removeTyping(chat);
+
+            const m = text.toLowerCase();
+            let response = '';
+
+            if (/^(hi|hello|hey|namaste|hola|greetings)/.test(m)) {
+                response = `**Hello!**\n\nI am **Kyro AI**, your intelligent assistant powered by Synapse. I can help you with:\n\n- **Coding** - Python, JavaScript, and more\n- **Writing** - Emails, essays, creative content\n- **Learning** - Explain any topic simply\n- **Analysis** - Deep reasoning and logic\n- **Translation** - Multiple languages\n\nWhat would you like to explore today?`;
+            } else if (/(who are you|what are you|your name)/.test(m)) {
+                response = `**I am Kyro AI**\n\nYour smart, fast, and reliable AI assistant.\n\n**Powered by:** Synapse\n\nI am here to help you learn, create, and solve problems. Just ask me anything!`;
+            } else if (/(how are you|kaise ho)/.test(m)) {
+                response = `**I am doing great!**\n\nAlways ready to help you. How about you? What can I assist you with today?`;
+            } else if (/(thank|shukriya|dhanyawad)/.test(m)) {
+                response = `**You are most welcome!**\n\nI am always here whenever you need me. Feel free to ask anything else!`;
+            } else if (/(code|program|python|javascript|java|html|css|react|bug|error)/.test(m)) {
+                response = `**I would love to help with coding!**\n\nHere is a simple Python example:\n\n\`\`\`python\n# Hello World in Python\nprint("Hello, Kyro AI!")\n\n# Simple function\ndef greet(name):\n    return f"Hello, {name}!"\n\nprint(greet("Developer"))\n\`\`\`\n\n**Tip:** Switch to **Kyro Thinking** in Settings for more advanced coding help with real AI models!`;
+            } else if (/(math|calculate|sum|multiply|equation|formula)/.test(m)) {
+                response = `**Math Help**\n\nI can explain mathematical concepts step by step.\n\n**Example - Pythagorean Theorem:**\n\nIn a right triangle:\n**a² + b² = c²**\n\nWhere **c** is the hypotenuse.\n\nFor a triangle with sides 3 and 4:\n3² + 4² = 9 + 16 = 25\nSo c = √25 = **5**\n\nWant me to explain another topic?`;
+            } else if (/(joke|funny|comedy|laugh)/.test(m)) {
+                const jokes = [
+                    `**Why do programmers prefer dark mode?**\n\nBecause light attracts bugs!`,
+                    `**Why did the AI go to therapy?**\n\nIt had too many neural issues!`,
+                    `**What did the JavaScript developer say before leaving?**\n\n"I will be back in a promise!"`
+                ];
+                response = jokes[Math.floor(Math.random() * jokes.length)];
+            } else if (/(motivation|inspire|success|life|goal|dream|struggle|sad|stress)/.test(m)) {
+                response = `**You have got this!**\n\n> *"The only way to do great work is to love what you do."*\n> — Steve Jobs\n\n**Remember:** Every expert was once a beginner. Keep pushing forward!`;
+            } else if (/(poem|poetry|shayari|kavita|quote)/.test(m)) {
+                response = `**Here is something for you:**\n\n*In the quiet of the mind,\nWhere thoughts and dreams align,\nThere lies a strength untold,\nA story yet to unfold.*\n\n**— Kyro AI**`;
+            } else if (/(study|padhai|exam|school|college|learn|education)/.test(m)) {
+                response = `**Study Help**\n\nI can help you with:\n- Topic explanations\n- Study notes\n- Exam preparation\n- Concept clarifications\n\n**What subject are you studying?** Tell me and I will break it down for you!`;
+            } else if (/(food|recipe|cook|meal)/.test(m)) {
+                response = `**Simple Pasta Recipe:**\n\n**Ingredients:**\n- 200g pasta\n- 2 tbsp olive oil\n- 3 garlic cloves\n- 1 cup tomato sauce\n- Salt, pepper, basil\n\n**Steps:**\n1. Boil pasta until al dente\n2. Saute garlic in olive oil\n3. Add tomato sauce and simmer\n4. Mix pasta with sauce\n5. Garnish with basil\n\n**Enjoy your meal!**`;
+            } else {
+                response = `**Great question!**\n\nI am currently in **Demo Mode**, which gives you smart responses for common topics.\n\n**Try asking about:**\n- Coding help\n- Study topics\n- Creative writing\n- Motivation\n- Jokes\n- Recipes\n\n**For unlimited AI power**, switch to **Kyro Thinking** in Settings and connect your API key.\n\nWhat would you like to know?`;
+            }
+
+            // Stream effect for demo
+            chat.messages.push({ role: 'assistant', content: '', timestamp: Date.now() });
+            renderChat();
+            const msgIndex = chat.messages.length - 1;
+            const words = response.split(' ');
+            for (let i = 0; i < words.length; i++) {
+                chat.messages[msgIndex].content += (i > 0 ? ' ' : '') + words[i];
+                if (i % 3 === 0) {
+                    renderChat();
+                    await new Promise(r => setTimeout(r, 30));
+                }
+            }
+            renderChat();
+            saveState();
+        }
+
+        // ========== API MODE ==========
+        async function sendApiResponse(chat, text) {
+            const provider = PROVIDERS[STATE.settings.provider];
+            if (!provider) throw new Error('No provider configured');
+
+            removeTyping(chat);
+            chat.messages.push({ role: 'assistant', content: '', isThinking: true, timestamp: Date.now() });
+            renderChat();
+
+            const messages = chat.messages.filter(m => !m.isTyping && !m.isThinking && m.role !== 'system').map(m => ({
+                role: m.role,
+                content: m.content
+            }));
+
+            const systemPrompt = STATE.settings.systemPrompt + (STATE.settings.chatLanguage !== 'auto' ? ` Respond in ${LANGUAGES.find(l => l.code === STATE.settings.chatLanguage)?.name || 'English'}.` : '');
+
+            // For Gemini, we need to handle thinking differently
+            if (STATE.settings.provider === 'gemini') {
+                await callGemini(chat, text, messages, systemPrompt);
+                return;
+            }
+
+            const url = provider.baseUrl + provider.streamEndpoint;
+            const body = provider.body(messages, systemPrompt);
+            body.stream = true;
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: provider.headers(STATE.settings.apiKey),
+                body: JSON.stringify(body)
+            });
+
+            if (!response.ok) {
+                const err = await response.json().catch(() => ({}));
+                throw new Error(err.error?.message || `API Error: ${response.status}`);
+            }
+
+            removeTyping(chat);
+            chat.messages.push({ role: 'assistant', content: '', timestamp: Date.now() });
+            renderChat();
+            const msgIndex = chat.messages.length - 1;
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+            STATE.isStreaming = true;
+
+            try {
+                while (STATE.isStreaming) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop();
+                    for (const line of lines) {
+                        const trimmed = line.trim();
+                        if (!trimmed || trimmed === 'data: [DONE]') continue;
+                        const chunk = provider.parseStream(trimmed);
+                        if (chunk) {
+                            chat.messages[msgIndex].content += chunk;
+                            renderChat();
+                        }
+                    }
+                }
+            } finally {
+                STATE.isStreaming = false;
+                reader.releaseLock();
+            }
+
+            saveState();
+        }
+
+        async function callGemini(chat, text, messages, systemPrompt) {
+            const provider = PROVIDERS.gemini;
+            const model = STATE.settings.model || 'gemini-1.5-flash';
+            const url = `${provider.baseUrl}/models/${model}:streamGenerateContent?key=${STATE.settings.apiKey}`;
+
+            const contents = messages.map(m => ({
+                role: m.role === 'assistant' ? 'model' : 'user',
+                parts: [{ text: m.content }]
+            }));
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents,
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                    generationConfig: { temperature: 0.7, maxOutputTokens: 8192 }
+                })
+            });
+
+            if (!response.ok) {
+                const err = await response.json().catch(() => ({}));
+                throw new Error(err.error?.message || `API Error: ${response.status}`);
+            }
+
+            removeTyping(chat);
+            chat.messages.push({ role: 'assistant', content: '', timestamp: Date.now() });
+            renderChat();
+            const msgIndex = chat.messages.length - 1;
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+            STATE.isStreaming = true;
+
+            try {
+                while (STATE.isStreaming) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    buffer += decoder.decode(value, { stream: true });
+                    // Gemini returns JSON objects, sometimes concatenated
+                    const objects = buffer.split('}\n{').map((o, i, arr) => {
+                        if (arr.length === 1) return o;
+                        if (i === 0) return o + '}';
+                        if (i === arr.length - 1) return '{' + o;
+                        return '{' + o + '}';
+                    });
+                    buffer = objects.pop() || '';
+                    for (const obj of objects) {
+                        try {
+                            const data = JSON.parse(obj.trim());
+                            const chunk = provider.parseStream(JSON.stringify(data));
+                            if (chunk) {
+                                chat.messages[msgIndex].content += chunk;
+                                renderChat();
+                            }
+                        } catch { /* ignore parse errors */ }
+                    }
+                }
+            } finally {
+                STATE.isStreaming = false;
+                reader.releaseLock();
+            }
+
+            saveState();
+        }
+
+        function stopGeneration() {
+            STATE.isStreaming = false;
+            if (STATE.abortController) {
+                STATE.abortController.abort();
+                STATE.abortController = null;
+            }
+        }
+
+        // ========== MARKDOWN PARSER ==========
+        function parseMarkdown(text) {
+            if (!text) return '';
+            let html = escapeHtml(text);
+
+            // Code blocks with language
+            html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
+                const language = lang || 'text';
+                const highlighted = highlightCode(code.trim(), language);
+                return `<div class="code-block"><div class="code-block-header"><span>${language}</span><button class="code-copy-btn" onclick="copyCode(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span></button></div><pre><code>${highlighted}</code></pre></div>`;
+            });
+
+            // Inline code
+            html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+            // Headers
+            html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+            html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+            html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+
+            // Bold and italic
+            html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+            html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+            html = html.replace(/__(.+?)__/g, '<strong>$1</strong>');
+            html = html.replace(/_(.+?)_/g, '<em>$1</em>');
+
+            // Links
+            html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+
+            // Blockquotes
+            html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
+
+            // Lists
+            html = html.replace(/^\s*[-*+]\s+(.+)$/gm, '<li>$1</li>');
+            html = html.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
+            html = html.replace(/<\/ul>\s*<ul>/g, '');
+
+            // Ordered lists
+            html = html.replace(/^\s*\d+\.\s+(.+)$/gm, '<li>$1</li>');
+
+            // Tables
+            html = html.replace(/\|(.+)\|\n\|[-:\s|]+\|\n((?:\|.+\|\n?)+)/g, (match, header, rows) => {
+                const headers = header.split('|').map(h => h.trim()).filter(h => h);
+                const rowData = rows.trim().split('\n').map(r => r.split('|').map(c => c.trim()).filter(c => c));
+                let table = '<table><thead><tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr></thead><tbody>';
+                rowData.forEach(row => {
+                    table += '<tr>' + row.map(c => `<td>${c}</td>`).join('') + '</tr>';
+                });
+                table += '</tbody></table>';
+                return table;
+            });
+
+            // Paragraphs and line breaks
+            html = html.replace(/\n\n/g, '</p><p>');
+            html = html.replace(/\n/g, '<br>');
+            html = '<p>' + html + '</p>';
+
+            // Clean up empty paragraphs and fix nested tags
+            html = html.replace(/<p><\/p>/g, '');
+            html = html.replace(/<p>(<(h[1-3]|pre|ul|blockquote|table|div))>/g, '$1');
+            html = html.replace(/(<\/(h[1-3]|pre|ul|blockquote|table|div)>)<\/p>/g, '$1');
+            html = html.replace(/<p><br><\/p>/g, '<br>');
+
+            return html;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ========== CODE HIGHLIGHTING ==========
+        function highlightCode(code, language) {
+            // Simple regex-based highlighting
+            const keywords = /\b(def|class|return|if|else|elif|for|while|import|from|as|try|except|finally|with|lambda|yield|async|await|function|var|let|const|if|else|switch|case|break|continue|return|class|extends|new|this|typeof|instanceof|public|private|static|void|int|float|double|char|string|bool|true|false|null|undefined)\b/g;
+            const strings = /("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)/g;
+            const comments = /(#.*$|\/\/.*$|\/\*[\s\S]*?\*\/)/gm;
+            const numbers = /\b(\d+\.?\d*)\b/g;
+
+            let html = escapeHtml(code);
+            html = html.replace(comments, '<span style="color: #6a9955;">$1</span>');
+            html = html.replace(strings, '<span style="color: #ce9178;">$1</span>');
+            html = html.replace(keywords, '<span style="color: #569cd6;">$1</span>');
+            html = html.replace(numbers, '<span style="color: #b5cea8;">$1</span>');
+            return html;
+        }
+
+        function copyCode(btn) {
+            const code = btn.closest('.code-block').querySelector('code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const span = btn.querySelector('span');
+                const original = span.textContent;
+                span.textContent = 'Copied!';
+                setTimeout(() => span.textContent = original, 2000);
+            });
+        }
+
+        // ========== MESSAGE ACTIONS ==========
+        function copyMessage(index) {
+            const chat = getCurrentChat();
+            if (!chat) return;
+            const text = chat.messages[index].content;
+            navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard', 'success'));
+        }
+
+        function regenerateMessage(index) {
+            const chat = getCurrentChat();
+            if (!chat) return;
+            // Find the user message before this AI message
+            let userIndex = -1;
+            for (let i = index - 1; i >= 0; i--) {
+                if (chat.messages[i].role === 'user') {
+                    userIndex = i;
+                    break;
+                }
+            }
+            if (userIndex === -1) return;
+            const userMsg = chat.messages[userIndex];
+            // Remove messages from userIndex onwards
+            chat.messages = chat.messages.slice(0, userIndex);
+            saveState();
+            renderChat();
+            document.getElementById('messageInput').value = userMsg.content;
+            autoResize(document.getElementById('messageInput'));
+            sendMessage();
+        }
+
+        function readAloud(index) {
+            const chat = getCurrentChat();
+            if (!chat) return;
+            const text = chat.messages[index].content.replace(/[#*`\[\]()>|-]/g, ' ').replace(/\s+/g, ' ').trim();
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 1;
+                utterance.pitch = 1;
+                window.speechSynthesis.speak(utterance);
+                showToast('Reading aloud...');
+            } else {
+                showToast('Text-to-speech not supported', 'error');
+            }
+        }
+
+        function shareMessage(index) {
+            const chat = getCurrentChat();
+            if (!chat) return;
+            const text = chat.messages[index].content;
+            if (navigator.share) {
+                navigator.share({ title: 'Kyro AI', text });
+            } else {
+                navigator.clipboard.writeText(text).then(() => showToast('Copied for sharing', 'success'));
+            }
+        }
+
+        function editMessage(index) {
+            const chat = getCurrentChat();
+            if (!chat) return;
+            const msg = chat.messages[index];
+            const newText = prompt('Edit message:', msg.content);
+            if (newText !== null) {
+                msg.content = newText;
+                // Remove all messages after this one
+                chat.messages = chat.messages.slice(0, index + 1);
+                saveState();
+                renderChat();
+                sendMessage();
+            }
+        }
+
+        function deleteMessage(index) {
+            const chat = getCurrentChat();
+            if (!chat) return;
+            chat.messages.splice(index, 1);
+            saveState();
+            renderChat();
+        }
+
+        // ========== FILE HANDLING ==========
+        function toggleAttachMenu() {
+            document.getElementById('attachMenu').classList.toggle('active');
+        }
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#attachBtn') && !e.target.closest('#attachMenu')) {
+                document.getElementById('attachMenu').classList.remove('active');
+            }
+        });
+
+        function triggerFileInput(type) {
+            document.getElementById('attachMenu').classList.remove('active');
+            const map = { image: 'imageInput', file: 'fileInput', pdf: 'pdfInput', audio: 'audioInput', video: 'videoInput' };
+            const input = document.getElementById(map[type] || 'fileInput');
+            if (input) input.click();
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            STATE.attachedFile = file;
+            renderFilePreview();
+            showToast('File attached: ' + file.name);
+        }
+
+        function renderFilePreview() {
+            const area = document.getElementById('filePreviewArea');
+            if (!STATE.attachedFile) { area.innerHTML = ''; return; }
+            const file = STATE.attachedFile;
+            const size = file.size < 1024 ? file.size + ' B' : file.size < 1024 * 1024 ? (file.size / 1024).toFixed(1) + ' KB' : (file.size / (1024 * 1024)).toFixed(1) + ' MB';
+            area.innerHTML = `
+                <div class="file-preview">
+                    <div class="file-preview-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                    <div class="file-preview-info">
+                        <div class="file-preview-name">${escapeHtml(file.name)}</div>
+                        <div class="file-preview-size">${size}</div>
+                    </div>
+                    <button class="file-preview-remove" onclick="removeFile()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    </button>
+                </div>
+            `;
+        }
+
+        function removeFile() {
+            STATE.attachedFile = null;
+            renderFilePreview();
+        }
+
+        // ========== VOICE INPUT ==========
+        function toggleVoice() {
+            const btn = document.getElementById('voiceBtn');
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                showToast('Voice input not supported on this device', 'error');
+                return;
+            }
+            if (STATE.recognition) {
+                STATE.recognition.stop();
+                STATE.recognition = null;
+                btn.classList.remove('recording');
+                btn.innerHTML = '<svg class="icon-lg" viewBox="0 0 24 24" style="stroke-width:1.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>';
+                return;
+            }
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            STATE.recognition = new SpeechRecognition();
+            STATE.recognition.lang = STATE.settings.chatLanguage === 'auto' ? 'en-US' : STATE.settings.chatLanguage;
+            STATE.recognition.interimResults = false;
+            STATE.recognition.maxAlternatives = 1;
+            STATE.recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                const input = document.getElementById('messageInput');
+                input.value = (input.value ? input.value + ' ' : '') + transcript;
+                autoResize(input);
+            };
+            STATE.recognition.onerror = () => {
+                showToast('Voice recognition error', 'error');
+                btn.classList.remove('recording');
+                STATE.recognition = null;
+            };
+            STATE.recognition.onend = () => {
+                btn.classList.remove('recording');
+                btn.innerHTML = '<svg class="icon-lg" viewBox="0 0 24 24" style="stroke-width:1.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>';
+                STATE.recognition = null;
+            };
+            STATE.recognition.start();
+            btn.classList.add('recording');
+            btn.innerHTML = '<div class="voice-wave"><div class="voice-wave-bar"></div><div class="voice-wave-bar"></div><div class="voice-wave-bar"></div><div class="voice-wave-bar"></div><div class="voice-wave-bar"></div></div>';
+            showToast('Listening...');
+        }
+
+        // ========== SCROLL ==========
+        function scrollToBottom() {
+            const container = document.getElementById('chatScroll');
+            container.scrollTop = container.scrollHeight;
+        }
+        document.getElementById('chatScroll').addEventListener('scroll', function() {
+            const btn = document.getElementById('scrollBottom');
+            const nearBottom = this.scrollHeight - this.scrollTop - this.clientHeight < 100;
+            btn.classList.toggle('visible', !nearBottom);
+        });
+
+        // ========== SETTINGS ==========
+        function openSettings() {
+            document.getElementById('settingsModal').classList.add('active');
+            document.getElementById('apiKeyInput').value = STATE.settings.apiKey;
+            selectMode(STATE.settings.mode);
+            detectProvider();
+            renderModelList();
+            renderFeatureGrid();
+        }
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.remove('active');
+        }
+        document.getElementById('settingsModal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeSettings();
+        });
+
+        function selectMode(mode) {
+            STATE.settings.mode = mode;
+            document.getElementById('modeDemo').classList.toggle('active', mode === 'demo');
+            document.getElementById('modeApi').classList.toggle('active', mode === 'api');
+            document.getElementById('checkDemo').textContent = mode === 'demo' ? '\u2713' : '';
+            document.getElementById('checkApi').textContent = mode === 'api' ? '\u2713' : '';
+            document.getElementById('apiSettings').style.display = mode === 'api' ? 'block' : 'none';
+            updateStatus();
+        }
+
+        function toggleKeyVisibility() {
+            const input = document.getElementById('apiKeyInput');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        function detectProvider() {
+            const key = document.getElementById('apiKeyInput').value.trim();
+            const badge = document.getElementById('providerBadge');
+            if (!key) {
+                badge.textContent = 'Auto-detecting...';
+                badge.className = 'provider-badge';
+                STATE.settings.provider = null;
+                return;
+            }
+            for (const [id, provider] of Object.entries(PROVIDERS)) {
+                if (provider.keyPattern.test(key)) {
+                    STATE.settings.provider = id;
+                    badge.textContent = provider.name + ' detected';
+                    badge.className = 'provider-badge detected';
+                    return;
+                }
+            }
+            badge.textContent = 'Unknown provider';
+            badge.className = 'provider-badge';
+            STATE.settings.provider = null;
+        }
+
+        async function fetchModels() {
+            const key = document.getElementById('apiKeyInput').value.trim();
+            if (!key || !STATE.settings.provider) {
+                showToast('Please enter a valid API key first', 'error');
+                return;
+            }
+            const provider = PROVIDERS[STATE.settings.provider];
+            if (!provider.modelsUrl) {
+                // Gemini doesn't have a models endpoint accessible easily, use defaults
+                STATE.settings.models = Object.keys(provider.modelMap).map(id => ({
+                    id,
+                    name: provider.modelMap[id] || id
+                }));
+                renderModelList();
+                renderFeatureGrid();
+                showToast('Models loaded');
+                return;
+            }
+            const btn = document.getElementById('fetchModelsBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner"></div>';
+            try {
+                const res = await fetch(provider.baseUrl + provider.modelsUrl, {
+                    headers: provider.headers(key)
+                });
+                if (!res.ok) throw new Error('Failed to fetch models');
+                const data = await res.json();
+                let models = [];
+                if (data.data) {
+                    models = data.data.map(m => ({
+                        id: m.id,
+                        name: mapModelName(m.id, provider)
+                    }));
+                } else if (Array.isArray(data)) {
+                    models = data.map(m => ({
+                        id: m.id || m.name,
+                        name: mapModelName(m.id || m.name, provider)
+                    }));
+                }
+                STATE.settings.models = models;
+                renderModelList();
+                renderFeatureGrid();
+                showToast(models.length + ' models loaded', 'success');
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>Fetch Models</span>';
+            }
+        }
+
+        function mapModelName(id, provider) {
+            for (const [pattern, name] of Object.entries(provider.modelMap)) {
+                if (id.includes(pattern.replace('*', ''))) return name;
+            }
+            // Generic Kyro mapping
+            if (id.includes('gpt')) return 'Kyro ' + id.replace('gpt-', '').replace('-turbo', ' Turbo');
+            if (id.includes('claude')) return 'Kyro ' + id.replace('claude-', '').replace('-', ' ');
+            if (id.includes('grok')) return 'Kyro ' + id.replace('grok-', '');
+            if (id.includes('deepseek')) return 'Kyro ' + id.replace('deepseek-', '');
+            if (id.includes('llama')) return 'Kyro ' + id.replace('llama-', '');
+            if (id.includes('gemini')) return 'Kyro ' + id.replace('gemini-', '');
+            if (id.includes('mistral')) return 'Kyro ' + id.replace('mistral-', '');
+            return 'Kyro Model';
+        }
+
+        function renderModelList() {
+            const container = document.getElementById('modelList');
+            const models = STATE.settings.models;
+            if (!models || models.length === 0) {
+                container.innerHTML = '<div style="padding: 12px; color: var(--text-tertiary); font-size: 13px;">Click "Fetch Models" to load available models</div>';
+                return;
+            }
+            container.innerHTML = models.map(m => `
+                <div class="model-item ${m.id === STATE.settings.model ? 'active' : ''}" onclick="selectModel('${m.id}')">
+                    <div class="model-item-name">${escapeHtml(m.name)}</div>
+                    <div class="model-item-id">${escapeHtml(m.id)}</div>
+                </div>
+            `).join('');
+        }
+
+        function selectModel(modelId) {
+            STATE.settings.model = modelId;
+            renderModelList();
+            renderFeatureGrid();
+        }
+
+        function renderFeatureGrid() {
+            const container = document.getElementById('featureGrid');
+            const provider = STATE.settings.provider ? PROVIDERS[STATE.settings.provider] : null;
+            const features = provider?.features || {};
+            container.innerHTML = FEATURES.map(f => {
+                const supported = features[f.id] || false;
+                return `
+                    <div class="feature-item ${supported ? '' : 'disabled'}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${f.icon}</svg>
+                        <span class="feature-item-label">${f.label}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function saveSettings() {
+            STATE.settings.apiKey = document.getElementById('apiKeyInput').value.trim();
+            STATE.settings.mode = document.getElementById('modeDemo').classList.contains('active') ? 'demo' : 'api';
+            saveState();
+            closeSettings();
+            updateStatus();
+            showToast('Settings saved');
+        }
+
+        function editSystemPrompt() {
+            document.getElementById('systemPromptInput').value = STATE.settings.systemPrompt;
+            document.getElementById('systemPromptModal').classList.add('active');
+        }
+        function closeSystemPrompt() {
+            document.getElementById('systemPromptModal').classList.remove('active');
+        }
+        document.getElementById('systemPromptModal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeSystemPrompt();
+        });
+        function saveSystemPrompt() {
+            STATE.settings.systemPrompt = document.getElementById('systemPromptInput').value.trim();
+            saveState();
+            closeSystemPrompt();
+            showToast('System prompt updated');
+        }
+
+        // ========== PROFILE ==========
+        function openProfile() {
+            document.getElementById('profileModal').classList.add('active');
+            document.getElementById('profileName').textContent = STATE.user?.username || 'User';
+            document.getElementById('profileHandle').textContent = '@' + (STATE.user?.username?.toLowerCase() || 'user');
+        }
+        function closeProfile() {
+            document.getElementById('profileModal').classList.remove('active');
+        }
+        document.getElementById('profileModal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeProfile();
+        });
+
+        function changeUsername() {
+            const newName = prompt('New username:', STATE.user?.username);
+            if (newName && newName.trim()) {
+                STATE.user.username = newName.trim();
+                saveState();
+                document.getElementById('profileName').textContent = STATE.user.username;
+                document.getElementById('profileHandle').textContent = '@' + STATE.user.username.toLowerCase();
+                showToast('Username updated');
+            }
+        }
+
+        function changePassword() {
+            const current = prompt('Current password:');
+            if (current !== STATE.user?.password) {
+                showToast('Incorrect password', 'error');
+                return;
+            }
+            const newPass = prompt('New password (min 4 chars):');
+            if (newPass && newPass.length >= 4) {
+                const oldKey = getEncKey();
+                STATE.user.password = newPass;
+                const newKey = getEncKey();
+                // Re-encrypt API key
+                if (STATE.settings.apiKey) {
+                    STATE.settings.apiKey = decrypt(encrypt(STATE.settings.apiKey, oldKey), newKey);
+                }
+                saveState();
+                showToast('Password changed successfully');
+            }
+        }
+
+        // ========== BACKUP / RESTORE ==========
+        function backupData() {
+            const data = localStorage.getItem('kyro_data');
+            if (!data) {
+                showToast('No data to backup', 'error');
+                return;
+            }
+            const encrypted = encrypt(data, getEncKey());
+            const blob = new Blob([JSON.stringify({ version: '2.0', data: encrypted })], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'kyro_backup_' + new Date().toISOString().slice(0, 10) + '.kyro';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Backup downloaded', 'success');
+        }
+
+        function restoreData() {
+            document.getElementById('restoreInput').click();
+        }
+
+        function handleRestore(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const backup = JSON.parse(e.target.result);
+                    if (!backup.data) throw new Error('Invalid backup file');
+                    const decrypted = decrypt(backup.data, getEncKey());
+                    if (!decrypted) throw new Error('Failed to decrypt - wrong password?');
+                    const data = JSON.parse(decrypted);
+                    if (confirm('This will replace all current data. Continue?')) {
+                        localStorage.setItem('kyro_data', JSON.stringify(data));
+                        loadState();
+                        initApp();
+                        showToast('Backup restored successfully', 'success');
+                    }
+                } catch (err) {
+                    showToast('Restore failed: ' + err.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        // ========== PAGE VIEWS ==========
+        function showPage(page) {
+            const modal = document.getElementById('pageModal');
+            const title = document.getElementById('pageTitle');
+            const body = document.getElementById('pageBody');
+            modal.classList.add('active');
+
+            const pages = {
+                library: { title: 'Library', content: renderLibrary() },
+                projects: { title: 'Projects', content: renderProjects() },
+                plugins: { title: 'Plugins', content: renderPlugins() },
+                tools: { title: 'Tools', content: renderTools() },
+                language: { title: 'Language', content: renderLanguage() },
+                backup: { title: 'Backup & Restore', content: renderBackupPage() },
+                about: { title: 'About', content: renderAbout() }
+            };
+
+            const p = pages[page] || { title: 'Page', content: '<div style="padding:40px;text-align:center;color:var(--text-tertiary)">Coming soon</div>' };
+            title.textContent = p.title;
+            body.innerHTML = p.content;
+        }
+
+        function closePage() {
+            document.getElementById('pageModal').classList.remove('active');
+        }
+
+        function renderLibrary() {
+            return `
+                <div class="content-grid">
+                    <div class="content-card" onclick="showToast('Image library - Coming soon')">
+                        <div class="content-card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></div>
+                        <div class="content-card-title">Images</div>
+                        <div class="content-card-desc">Saved images</div>
+                    </div>
+                    <div class="content-card" onclick="showToast('Document library - Coming soon')">
+                        <div class="content-card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                        <div class="content-card-title">Documents</div>
+                        <div class="content-card-desc">PDFs and files</div>
+                    </div>
+                    <div class="content-card" onclick="showToast('Code library - Coming soon')">
+                        <div class="content-card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+                        <div class="content-card-title">Code Snippets</div>
+                        <div class="content-card-desc">Saved code blocks</div>
+                    </div>
+                    <div class="content-card" onclick="showToast('Chat library - Coming soon')">
+                        <div class="content-card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+                        <div class="content-card-title">Saved Chats</div>
+                        <div class="content-card-desc">Exported conversations</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderProjects() {
+            return `
+                <div style="padding: 16px;">
+                    <button class="btn btn-primary" style="margin-bottom: 16px;" onclick="showToast('Create project - Coming soon')">
+                        <svg class="icon-sm" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                        New Project
+                    </button>
+                    <div class="content-grid">
+                        <div class="content-card" onclick="showToast('Project view - Coming soon')">
+                            <div class="content-card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10"/><path d="m13.5 14.5 2-2"/><path d="m15.5 12.5 2 2"/><circle cx="18" cy="18" r="3"/></svg></div>
+                            <div class="content-card-title">General</div>
+                            <div class="content-card-desc">Default project</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPlugins() {
+            const provider = STATE.settings.provider ? PROVIDERS[STATE.settings.provider] : null;
+            const features = provider?.features || {};
+            return `
+                <div style="padding: 16px;">
+                    <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+                        Plugins are automatically enabled based on your connected AI provider.
+                    </div>
+                    <div class="content-grid" style="grid-template-columns: 1fr;">
+                        ${FEATURES.map(f => {
+                            const supported = features[f.id] || false;
+                            return `
+                                <div class="content-card" style="display: flex; align-items: center; gap: 12px; opacity: ${supported ? 1 : 0.5};">
+                                    <div class="content-card-icon" style="margin-bottom: 0;">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${f.icon}</svg>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <div class="content-card-title">${f.label}</div>
+                                        <div class="content-card-desc">${supported ? 'Enabled' : 'Not supported by current provider'}</div>
+                                    </div>
+                                    <div class="badge ${supported ? 'badge-success' : 'badge-ghost'}">${supported ? 'Active' : 'Inactive'}</div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTools() {
+            const tools = [
+                { name: 'Image Analyzer', icon: '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>', desc: 'Analyze images with AI' },
+                { name: 'OCR', icon: '<path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/>', desc: 'Extract text from images' },
+                { name: 'Camera', icon: '<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>', desc: 'Capture and analyze' },
+                { name: 'Translator', icon: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>', desc: 'Translate languages' },
+                { name: 'Markdown Preview', icon: '<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/>', desc: 'Preview markdown' },
+                { name: 'Code Formatter', icon: '<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>', desc: 'Format code' },
+                { name: 'JSON Viewer', icon: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>', desc: 'View JSON data' },
+                { name: 'QR Scanner', icon: '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>', desc: 'Scan QR codes' }
+            ];
+            return `
+                <div class="content-grid">
+                    ${tools.map(t => `
+                        <div class="content-card" onclick="showToast('${t.name} - Coming soon')">
+                            <div class="content-card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${t.icon}</svg></div>
+                            <div class="content-card-title">${t.name}</div>
+                            <div class="content-card-desc">${t.desc}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderLanguage() {
+            return `
+                <div style="padding: 16px;">
+                    <div class="setting-card">
+                        <div class="setting-card-title">Interface Language</div>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                            ${LANGUAGES.map(l => `
+                                <div class="mode-card ${STATE.settings.language === l.code ? 'active' : ''}" onclick="setLanguage('${l.code}')" style="padding: 12px;">
+                                    <div class="mode-card-info">
+                                        <div class="mode-card-title">${l.name}</div>
+                                    </div>
+                                    <div class="mode-card-check">${STATE.settings.language === l.code ? '\u2713' : ''}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="setting-card">
+                        <div class="setting-card-title">Chat Language</div>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                            <div class="mode-card ${STATE.settings.chatLanguage === 'auto' ? 'active' : ''}" onclick="setChatLanguage('auto')" style="padding: 12px;">
+                                <div class="mode-card-info"><div class="mode-card-title">Auto Detect</div></div>
+                                <div class="mode-card-check">${STATE.settings.chatLanguage === 'auto' ? '\u2713' : ''}</div>
+                            </div>
+                            ${LANGUAGES.map(l => `
+                                <div class="mode-card ${STATE.settings.chatLanguage === l.code ? 'active' : ''}" onclick="setChatLanguage('${l.code}')" style="padding: 12px;">
+                                    <div class="mode-card-info"><div class="mode-card-title">${l.name}</div></div>
+                                    <div class="mode-card-check">${STATE.settings.chatLanguage === l.code ? '\u2713' : ''}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function setLanguage(code) {
+            STATE.settings.language = code;
+            saveState();
+            showToast('Interface language set to ' + LANGUAGES.find(l => l.code === code)?.name);
+            renderLanguage();
+        }
+
+        function setChatLanguage(code) {
+            STATE.settings.chatLanguage = code;
+            saveState();
+            showToast('Chat language set to ' + (code === 'auto' ? 'Auto Detect' : LANGUAGES.find(l => l.code === code)?.name));
+            renderLanguage();
+        }
+
+        function renderBackupPage() {
+            return `
+                <div style="padding: 16px;">
+                    <div class="setting-card">
+                        <div class="setting-card-title">Backup</div>
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+                            Create an encrypted .kyro file containing all your chats, settings, and preferences.
+                        </div>
+                        <button class="btn btn-primary" onclick="backupData(); closePage();">
+                            <svg class="icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Create Backup
+                        </button>
+                    </div>
+                    <div class="setting-card">
+                        <div class="setting-card-title">Restore</div>
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+                            Restore your data from a previously created .kyro backup file.
+                        </div>
+                        <button class="btn btn-secondary" onclick="restoreData(); closePage();">
+                            <svg class="icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            Restore from File
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAbout() {
+            return `
+                <div style="padding: 40px 20px; text-align: center; max-width: 400px; margin: 0 auto;">
+                    <div style="width: 80px; height: 80px; border-radius: 20px; background: var(--bg-glass); border: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 800; color: var(--accent); margin: 0 auto 20px; box-shadow: var(--shadow-glow);">K</div>
+                    <div style="font-size: 24px; font-weight: 800; margin-bottom: 4px;">Kyro AI</div>
+                    <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 24px;">Version 2.0 - Powered by Synapse</div>
+                    <div style="background: var(--bg-glass); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 24px; margin-bottom: 24px;">
+                        <div style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px;">Founder</div>
+                        <div style="font-size: 16px; font-weight: 700; color: var(--accent);">Nitin Kushwanshi</div>
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-tertiary); line-height: 1.6;">
+                        Kyro AI is a premium AI assistant built for speed, privacy, and intelligence.
+                        All data is stored locally on your device.
+                    </div>
+                </div>
+            `;
+        }
+
+        // ========== INIT APP ==========
+        init();
+    </script>
+</body>
+</html>
