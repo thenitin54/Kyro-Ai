@@ -2296,107 +2296,91 @@
                 throw new Error(err.error?.message || `API Error: ${response.status}`);
             }
 
-            removeTyping(chat);
-            chat.messages.push({ role: 'assistant', content: '', timestamp: Date.now() });
-            renderChat();
-            const msgIndex = chat.messages.length - 1;
+                removeTyping(chat);
+chat.messages.push({ role: 'assistant', content: '', timestamp: Date.now() });
+renderChat();
+const msgIndex = chat.messages.length - 1;
 
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let buffer = '';
-            STATE.isStreaming = true;
+const reader = response.body.getReader();
+const decoder = new TextDecoder();
+let buffer = '';
+STATE.isStreaming = true;
 
-            try {
-                while (STATE.isStreaming) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    buffer += decoder.decode(value, { stream: true });
-                    const lines = buffer.split('\n');
-                    buffer = lines.pop();
-                    for (const line of lines) {
-                        const trimmed = line.trim();
-                        if (!trimmed || trimmed === 'data: [DONE]') continue;
-                        const chunk = provider.parseStream(trimmed);
-                        if (chunk) {
-                            chat.messages[msgIndex].content += chunk;
-                            renderChat();
-                        }
-                    }
-                }
-            } finally {
-                STATE.isStreaming = false;
-                reader.releaseLock();
+try {
+    while (STATE.isStreaming) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+
+        for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed || trimmed === 'data: [DONE]') continue;
+
+            const chunk = provider.parseStream(trimmed);
+
+            if (chunk) {
+                chat.messages[msgIndex].content += chunk;
+                renderChat();
             }
-
-            saveState();
         }
+    }
+} finally {
+    STATE.isStreaming = false;
+    reader.releaseLock();
+}
 
+saveState();
+}
+            
         async function callGemini(chat, text, messages, systemPrompt) {
-            const provider = PROVIDERS.gemini;
-            const model = STATE.settings.model || 'gemini-1.5-flash';
-            const url = `${provider.baseUrl}/models/${model}:streamGenerateContent?key=${STATE.settings.apiKey}`;
+    const provider = PROVIDERS.gemini;
+    const model = "gemini-2.5-flash";
 
-            const contents = messages.map(m => ({
-                role: m.role === 'assistant' ? 'model' : 'user',
-                parts: [{ text: m.content }]
-            }));
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${STATE.settings.apiKey}`;
 
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents,
-                    systemInstruction: { parts: [{ text: systemPrompt }] },
-                    generationConfig: { temperature: 0.7, maxOutputTokens: 8192 }
-                })
-            });
+    const contents = messages.map(m => ({
+        role: m.role === "assistant" ? "model" : "user",
+        parts: [{ text: m.content }]
+    }));
 
-            if (!response.ok) {
-                const err = await response.json().catch(() => ({}));
-                throw new Error(err.error?.message || `API Error: ${response.status}`);
+    const response = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            contents,
+            systemInstruction: {
+                parts: [{ text: systemPrompt }]
+            },
+            generationConfig: {
+                temperature: 0.7,
+                maxOutputTokens: 8192
             }
+        })
+    });
 
-            removeTyping(chat);
-            chat.messages.push({ role: 'assistant', content: '', timestamp: Date.now() });
-            renderChat();
-            const msgIndex = chat.messages.length - 1;
+    const data = await response.json();
 
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let buffer = '';
-            STATE.isStreaming = true;
+    if (!response.ok) {
+        throw new Error(data.error?.message || `API Error: ${response.status}`);
+    }
 
-            try {
-                while (STATE.isStreaming) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    buffer += decoder.decode(value, { stream: true });
-                    // Gemini returns JSON objects, sometimes concatenated
-                    const objects = buffer.split('}\n{').map((o, i, arr) => {
-                        if (arr.length === 1) return o;
-                        if (i === 0) return o + '}';
-                        if (i === arr.length - 1) return '{' + o;
-                        return '{' + o + '}';
-                    });
-                    buffer = objects.pop() || '';
-                    for (const obj of objects) {
-                        try {
-                            const data = JSON.parse(obj.trim());
-                            const chunk = provider.parseStream(JSON.stringify(data));
-                            if (chunk) {
-                                chat.messages[msgIndex].content += chunk;
-                                renderChat();
-                            }
-                        } catch { /* ignore parse errors */ }
-                    }
-                }
-            } finally {
-                STATE.isStreaming = false;
-                reader.releaseLock();
-            }
+    removeTyping(chat);
 
-            saveState();
-        }
+    chat.messages.push({
+        role: "assistant",
+        content: data.candidates?.[0]?.content?.parts?.[0]?.text || "No response",
+        timestamp: Date.now()
+    });
+
+    renderChat();
+    saveState();
+    
+        }                                                                                                                                  
 
         function stopGeneration() {
             STATE.isStreaming = false;
