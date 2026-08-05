@@ -2337,7 +2337,7 @@ saveState();
             
         async function callGemini(chat, text, messages, systemPrompt) {
     const provider = PROVIDERS.gemini;
-    const model = "gemini-2.5-pro";
+    const model = "gemini-2.0-flash";
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${STATE.settings.apiKey}`;
 
