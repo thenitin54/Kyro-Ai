@@ -1,0 +1,8 @@
+{
+  "appId": "com.kyro.ai",
+  "appName": "KYRO",
+  "webDir": ".",
+  "server": {
+    "androidScheme": "https"
+  }
+}
