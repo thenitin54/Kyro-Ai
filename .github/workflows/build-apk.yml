@@ -1,1 +1,76 @@
+name: Build KYRO APK
 
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout KYRO
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Prepare web assets
+        run: |
+          mkdir -p www
+          cp index.html www/index.html
+
+      - name: Install Capacitor Android
+        run: |
+          npm install @capacitor/android@8.0.0
+          npx cap add android
+
+      - name: Add Android runtime permissions
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('android/app/src/main/AndroidManifest.xml')
+          s = p.read_text(encoding='utf-8')
+          perms = [
+              '    <uses-permission android:name="android.permission.CAMERA" />',
+              '    <uses-permission android:name="android.permission.RECORD_AUDIO" />',
+              '    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />',
+              '    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />',
+          ]
+          additions = '\n'.join(perms) + '\n'
+          if 'android.permission.CAMERA' not in s:
+              s = s.replace('<manifest ', '<manifest ', 1)
+              marker = '>'
+              pos = s.find(marker, s.find('<manifest '))
+              s = s[:pos+1] + '\n' + additions + s[pos+1:]
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Sync KYRO
+        run: npx cap sync android
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Build APK
+        working-directory: android
+        run: ./gradlew assembleDebug
+
+      - name: Upload KYRO APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: KYRO-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 7
