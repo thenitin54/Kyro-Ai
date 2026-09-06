@@ -12,6 +12,7 @@ permissions:
 jobs:
   build-apk:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout KYRO
         uses: actions/checkout@v4
@@ -34,24 +35,79 @@ jobs:
           npm install @capacitor/android@8.0.0
           npx cap add android
 
+      - name: Install Pillow for launcher icon processing
+        run: |
+          python3 -m pip install --user pillow
+
+      - name: Install KYRO launcher icon
+        run: |
+          test -f resources/icon.png
+
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import re
+
+          src = Path("resources/icon.png")
+          out_dir = Path("android/app/src/main/res/drawable")
+          out_dir.mkdir(parents=True, exist_ok=True)
+
+          # Use the supplied transparent KYRO icon as the native Android launcher icon.
+          img = Image.open(src).convert("RGBA")
+          img.save(out_dir / "kyro_icon.png", optimize=True)
+
+          manifest = Path("android/app/src/main/AndroidManifest.xml")
+          text = manifest.read_text(encoding="utf-8")
+
+          # Point both launcher icon fields to the KYRO icon.
+          text = re.sub(
+              r'android:icon="[^"]*"',
+              'android:icon="@drawable/kyro_icon"',
+              text,
+              count=1
+          )
+
+          if 'android:roundIcon=' in text:
+              text = re.sub(
+                  r'android:roundIcon="[^"]*"',
+                  'android:roundIcon="@drawable/kyro_icon"',
+                  text,
+                  count=1
+              )
+          else:
+              text = text.replace(
+                  '<application',
+                  '<application android:roundIcon="@drawable/kyro_icon"',
+                  1
+              )
+
+          manifest.write_text(text, encoding="utf-8")
+          PY
+
+          echo "KYRO launcher icon installed:"
+          ls -lh android/app/src/main/res/drawable/kyro_icon.png
+
       - name: Add Android runtime permissions
         run: |
           python3 - <<'PY'
           from pathlib import Path
+
           p = Path('android/app/src/main/AndroidManifest.xml')
           s = p.read_text(encoding='utf-8')
+
           perms = [
-              '    <uses-permission android:name="android.permission.CAMERA" />',
-              '    <uses-permission android:name="android.permission.RECORD_AUDIO" />',
-              '    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />',
-              '    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />',
+            '<uses-permission android:name="android.permission.CAMERA" />',
+            '<uses-permission android:name="android.permission.RECORD_AUDIO" />',
+            '<uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />',
+            '<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />'
           ]
-          additions = '\n'.join(perms) + '\n'
+
+          additions = '\n'.join(perms)
+
           if 'android.permission.CAMERA' not in s:
-              s = s.replace('<manifest ', '<manifest ', 1)
-              marker = '>'
-              pos = s.find(marker, s.find('<manifest '))
-              s = s[:pos+1] + '\n' + additions + s[pos+1:]
+              pos = s.find('>', s.find('<manifest'))
+              s = s[:pos+1] + '\n' + additions + '\n' + s[pos+1:]
+
           p.write_text(s, encoding='utf-8')
           PY
 
